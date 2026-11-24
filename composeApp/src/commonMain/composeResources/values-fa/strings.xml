@@ -165,9 +165,9 @@
     <string name="settings_palette_dialog_description">یک پالت رنگ تأکیدی Millennium انتخاب کنید و پیش‌نمایش آن را در حالت روشن و تیره ببینید.</string>
     <string name="settings_palette_label">پالت</string>
     <string name="settings_appearance_subtitle_palette">پالت Millennium و رنگ تأکیدی. فعلی: %1$s</string>
-    <string name="settings_palette_blue">آبی</string>
-    <string name="settings_palette_orange">نارنجی</string>
-    <string name="settings_palette_lime">لیمویی</string>
+    <string name="settings_palette_blue">Flux</string>
+    <string name="settings_palette_orange">Braise</string>
+    <string name="settings_palette_lime">Prisme</string>
 
     <string name="settings_download_folder_title">پوشهٔ دانلود سفارشی</string>
     <string name="settings_download_folder_current">پوشهٔ فعلی: %1$s</string>

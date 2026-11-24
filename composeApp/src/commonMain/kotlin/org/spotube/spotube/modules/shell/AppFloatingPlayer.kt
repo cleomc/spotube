@@ -18,6 +18,7 @@
 package org.spotube.spotube.modules.shell
 
 
+import androidx.compose.ui.graphics.SolidColor
 import org.spotube.millennium.composables.MillenniumIcon
 import org.spotube.millennium.composables.MillenniumIconButton
 import org.spotube.millennium.composables.MillenniumIconButtonStyle
@@ -138,9 +139,9 @@ internal fun FloatingPlayerContent(
             .fillMaxWidth()
             .height(FloatingPlayerContentHeight + FloatingPlayerBottomBleed)
             .millenniumSurface(
-                background = millenniumPanelBrush(MillenniumTheme.colors),
-                shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
-                borderColor = MillenniumTheme.colors.border,
+                background = SolidColor(MillenniumTheme.colors.surface),
+                shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+                borderColor = MillenniumTheme.colors.border.copy(alpha = 0.55f),
                 borderWidth = 1.dp,
             )
     ) {

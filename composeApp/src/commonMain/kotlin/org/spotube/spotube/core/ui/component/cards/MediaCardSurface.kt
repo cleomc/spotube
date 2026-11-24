@@ -3,6 +3,8 @@
  */
 package org.spotube.spotube.core.ui.component.cards
 
+import org.spotube.spotube.core.ui.theming.AppTheme
+import androidx.compose.ui.graphics.Color
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.LocalIndication
@@ -46,12 +48,13 @@ internal fun MediaCardSurface(
     val focused by interaction.collectIsFocusedAsState()
     var groupFocused by remember { mutableStateOf(false) }
     val colors = MillenniumTheme.colors
+    val flux = AppTheme.flux
     val highlight by animateFloatAsState(
         if (hovered || focused || groupFocused || pressed) 1f else 0f,
         tween(140)
     )
     val scale by animateFloatAsState(if (pressed) 0.985f else 1f, tween(100))
-    val shape = RoundedCornerShape(10.dp)
+    val shape = RoundedCornerShape(18.dp)
     Box(
         modifier.graphicsLayer { scaleX = scale; scaleY = scale }
             .millenniumSurface(
@@ -63,10 +66,12 @@ internal fun MediaCardSurface(
                     )
                 ),
                 shape = shape,
-                borderColor = (if (focused) colors.accent else colors.border).copy(alpha = highlight),
+                borderColor = (if (focused) colors.accent else colors.border).copy(alpha = highlight * 0.55f),
                 borderWidth = if (focused) 2.dp else 1.dp,
-                innerGlowColor = colors.highlight.copy(alpha = highlight * 0.4f),
-                shadowElevation = (highlight * 4f).dp
+                innerGlowColor = Color.Transparent,
+                shadowElevation = (highlight * 10f).dp,
+                // Flux: hovered cards glow in the aurora colours instead of a grey drop shadow.
+                shadowColors = listOf(flux.flowA.copy(alpha = 0.45f), flux.flowB.copy(alpha = 0.35f))
             )
             .clip(shape)
             .onFocusChanged { groupFocused = it.hasFocus }

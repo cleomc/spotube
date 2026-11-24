@@ -19,6 +19,7 @@ package org.spotube.spotube.core.ui.component
 
 
 
+import org.spotube.spotube.core.ui.theming.fluxBackground
 import com.composeunstyled.currentWindowWidthBreakpoint
 import org.spotube.millennium.adaptive.WindowBreakpoints
 import androidx.compose.animation.AnimatedContent
@@ -1017,7 +1018,7 @@ fun previewTracks(): List<MetadataTrack> {
 @Composable
 @Preview
 private fun TrackListPreview() {
-    Box(modifier = Modifier.fillMaxSize().background(AppTheme.colors.background)) {
+    Box(modifier = Modifier.fillMaxSize().fluxBackground()) {
         TrackList(
             tracks = previewTracks(),
             hasMore = true,

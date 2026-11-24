@@ -18,6 +18,7 @@
 package org.spotube.spotube.modules.artist
 
 
+import org.spotube.spotube.core.ui.theming.fluxBackground
 import org.spotube.spotube.core.ui.misc.itemsWithUniqueKeys
 import org.spotube.millennium.composables.MillenniumIcon
 import org.spotube.millennium.composables.MillenniumButton
@@ -122,7 +123,7 @@ fun ArtistScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MillenniumTheme.colors.background)
+            .fluxBackground()
     ) {
         ApplicationMainBar()
         Box(modifier = Modifier.fillMaxWidth().weight(1f)) {

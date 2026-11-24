@@ -17,6 +17,14 @@
 
 package org.spotube.spotube.modules.shell
 
+import org.spotube.spotube.core.ui.theming.fluxGlass
+import org.spotube.spotube.core.ui.theming.AppTheme
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.WindowInsets
 import com.composeunstyled.LocalTextStyle
 import com.composeunstyled.Text
 import org.spotube.millennium.composables.MillenniumBottomNavigationBar
@@ -39,13 +47,21 @@ fun AppBottombar(
     modifier: Modifier = Modifier,
     libraryBadge: @Composable () -> Unit = { DownloadBadgeIndicator() }
 ) {
-    MillenniumBottomNavigationBar(modifier = modifier) {
+    // Floating fluted-glass pill, 12dp in from the edges and above the system navigation bar.
+    MillenniumBottomNavigationBar(
+        modifier = modifier
+            .windowInsetsPadding(WindowInsets.navigationBars)
+            .padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
+            .fluxGlass(CircleShape),
+        windowInsets = WindowInsets(0, 0, 0, 0)
+    ) {
         bottombarTabs.filterIsInstance<NavigationItem.Tab<*>>()
             .forEach { tab ->
                 val selected = navigationState.topLevelRoute == tab.route
                 val title = stringResource(tab.title)
                 MillenniumBottomNavigationItem(
                     selected = selected,
+                    background = if (selected) AppTheme.fluxBrush else null,
                     onClick = { navigator.navigate(tab.route) },
                     contentDescription = title,
                     icon = {

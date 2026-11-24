@@ -162,14 +162,14 @@
     <string name="settings_preview_secondary">Secondaire</string>
 
     <string name="settings_palette_title">Palette</string>
-    <string name="settings_palette_subtitle_current">Palette d\'accentuation Millennium. Actuelle : %1$s</string>
+    <string name="settings_palette_subtitle_current">Palette d\'accentuation. Actuelle : %1$s</string>
     <string name="settings_palette_dialog_title">Palette</string>
-    <string name="settings_palette_dialog_description">Choisissez une palette d\'accentuation Millennium et prévisualisez-la en clair et en sombre.</string>
+    <string name="settings_palette_dialog_description">Choisissez une palette d\'accentuation et prévisualisez-la en clair et en sombre.</string>
     <string name="settings_palette_label">Palette</string>
-    <string name="settings_appearance_subtitle_palette">Palette Millennium et accentuation. Actuelle : %1$s</string>
-    <string name="settings_palette_blue">Bleu</string>
-    <string name="settings_palette_orange">Orange</string>
-    <string name="settings_palette_lime">Citron vert</string>
+    <string name="settings_appearance_subtitle_palette">Palette d\'accentuation. Actuelle : %1$s</string>
+    <string name="settings_palette_blue">Flux</string>
+    <string name="settings_palette_orange">Braise</string>
+    <string name="settings_palette_lime">Prisme</string>
 
     <string name="settings_download_folder_title">Dossier de téléchargement personnalisé</string>
     <string name="settings_download_folder_current">Dossier actuel : %1$s</string>

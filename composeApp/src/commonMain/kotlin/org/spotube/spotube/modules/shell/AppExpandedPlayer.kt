@@ -18,6 +18,7 @@
 package org.spotube.spotube.modules.shell
 
 
+import org.spotube.spotube.core.ui.theming.fluxBackground
 import org.spotube.millennium.composables.MillenniumIcon
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -281,7 +282,7 @@ fun AppExpandedPlayer(
         }
     }
 
-    Box(modifier = modifier.fillMaxSize().background(AppTheme.colors.background)) {
+    Box(modifier = modifier.fillMaxSize().fluxBackground()) {
         if (playerOptionsUiState.isMoreOptionsSheetOpen) {
             MillenniumModalBottomSheet(
                 state = moreOptionsSheetState,
@@ -576,12 +577,12 @@ fun AppExpandedPlayer(
                 ) {
                     Text(
                         text = formatPlayerTime(playerUiState.position),
-                        style = AppTheme.typography.labelSmall,
+                        style = AppTheme.typography.time,
                         color = AppTheme.colors.onSurfaceVariant
                     )
                     Text(
                         text = formatPlayerTime(playerUiState.displayDuration),
-                        style = AppTheme.typography.labelSmall,
+                        style = AppTheme.typography.time,
                         color = AppTheme.colors.onSurfaceVariant
                     )
                 }

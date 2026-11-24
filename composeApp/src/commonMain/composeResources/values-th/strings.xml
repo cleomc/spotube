@@ -163,9 +163,9 @@
     <string name="settings_palette_dialog_description">เลือกชุดสีเน้น Millennium และดูตัวอย่างทั้งในโหมดสว่างและมืด</string>
     <string name="settings_palette_label">ชุดสี</string>
     <string name="settings_appearance_subtitle_palette">ชุดสีและสีเน้น Millennium ปัจจุบัน: %1$s</string>
-    <string name="settings_palette_blue">น้ำเงิน</string>
-    <string name="settings_palette_orange">ส้ม</string>
-    <string name="settings_palette_lime">เขียวมะนาว</string>
+    <string name="settings_palette_blue">Flux</string>
+    <string name="settings_palette_orange">Braise</string>
+    <string name="settings_palette_lime">Prisme</string>
 
     <string name="settings_download_folder_title">กำหนดโฟลเดอร์ดาวน์โหลดเอง</string>
     <string name="settings_download_folder_current">โฟลเดอร์ปัจจุบัน: %1$s</string>

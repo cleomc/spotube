@@ -59,7 +59,7 @@ fun PlayableListTile(
     playLoading: Boolean = false,
     addToQueueLoading: Boolean = false,
     imageModel: Any? = imageURL,
-    imageShape: Shape = RoundedCornerShape(6.dp),
+    imageShape: Shape = RoundedCornerShape(10.dp),
     placeholderIcon: ImageVector = Iconsax.IconsaxMusic,
     artwork: (@Composable () -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null,
@@ -72,7 +72,7 @@ fun PlayableListTile(
         onClick = onClick ?: onPlay,
         selected = isPlaying,
         background = if (isPlaying) null else millenniumPanelBrush(colors),
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(12.dp),
         borderColor = if (isBlacklisted) colors.danger.copy(alpha = 0.5f) else if (isPlaying) null else colors.border,
         titleForeground = if (isBlacklisted) colors.danger else null,
         borderWidth = 1.dp,
@@ -152,7 +152,7 @@ internal fun MediaArtwork(
     model: Any?,
     title: String,
     modifier: Modifier,
-    shape: Shape = RoundedCornerShape(6.dp),
+    shape: Shape = RoundedCornerShape(10.dp),
     placeholderIcon: ImageVector = Iconsax.IconsaxMusic,
     artwork: (@Composable () -> Unit)? = null
 ) {

@@ -17,6 +17,7 @@
 
 package org.spotube.spotube.modules.welcome
 
+import org.spotube.spotube.core.ui.theming.fluxWordmarkStyle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -61,9 +62,7 @@ fun WelcomeWordmark(
     fontSize: TextUnit = AppTheme.typography.displaySmall.fontSize
 ) {
     Text(
-        stringResource(Res.string.welcome_app_name),
+        stringResource(Res.string.welcome_app_name).lowercase(),
         modifier = modifier,
-        fontFamily = FontFamily(Font(Res.font.cookie_regular)),
-        fontSize = fontSize,
-        color = AppTheme.colors.onSurface)
+        style = fluxWordmarkStyle(AppTheme.typography.wordmark.copy(fontSize = fontSize, lineHeight = fontSize * 1.15f)))
 }

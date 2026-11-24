@@ -164,9 +164,9 @@
     <string name="settings_palette_dialog_description">Millennium एक्सेंट पैलेट चुनें और उसे लाइट और डार्क में देखें।</string>
     <string name="settings_palette_label">पैलेट</string>
     <string name="settings_appearance_subtitle_palette">Millennium पैलेट और एक्सेंट। मौजूदा: %1$s</string>
-    <string name="settings_palette_blue">नीला</string>
-    <string name="settings_palette_orange">नारंगी</string>
-    <string name="settings_palette_lime">लाइम</string>
+    <string name="settings_palette_blue">Flux</string>
+    <string name="settings_palette_orange">Braise</string>
+    <string name="settings_palette_lime">Prisme</string>
 
     <string name="settings_download_folder_title">डाउनलोड फ़ोल्डर बदलें</string>
     <string name="settings_download_folder_current">मौजूदा फ़ोल्डर: %1$s</string>

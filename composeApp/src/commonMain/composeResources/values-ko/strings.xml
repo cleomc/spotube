@@ -163,9 +163,9 @@
     <string name="settings_palette_dialog_description">Millennium 강조 팔레트를 선택하고 라이트 및 다크 모드에서 미리 확인하세요.</string>
     <string name="settings_palette_label">팔레트</string>
     <string name="settings_appearance_subtitle_palette">Millennium 팔레트 및 강조 색상. 현재: %1$s</string>
-    <string name="settings_palette_blue">블루</string>
-    <string name="settings_palette_orange">오렌지</string>
-    <string name="settings_palette_lime">라임</string>
+    <string name="settings_palette_blue">Flux</string>
+    <string name="settings_palette_orange">Braise</string>
+    <string name="settings_palette_lime">Prisme</string>
 
     <string name="settings_download_folder_title">다운로드 폴더 지정</string>
     <string name="settings_download_folder_current">현재 폴더: %1$s</string>

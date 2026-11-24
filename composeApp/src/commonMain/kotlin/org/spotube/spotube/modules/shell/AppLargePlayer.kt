@@ -18,6 +18,7 @@
 package org.spotube.spotube.modules.shell
 
 
+import androidx.compose.foundation.border
 import org.spotube.millennium.composables.MillenniumDropdownMenuItem
 import org.spotube.spotube.resources.iconsax.IconsaxCd
 import org.spotube.spotube.resources.iconsax.IconsaxMoon
@@ -225,16 +226,20 @@ fun AppLargePlayer(
 
     // A translucent tint (not near-opaque) so the blurred art behind still reads through, and
     // the material's watery caustics sit on top of it.
-    val surfaceTint = AppTheme.colors.surface.copy(alpha = 0.6f)
+    val surfaceTint = AppTheme.flux.glass
+    val panelShape = AppTheme.shapes.large
 
     Column(
         modifier = modifier
             .windowInsetsPadding(WindowInsets.navigationBars)
+            // Flux: the player floats as a rounded glass panel, 12dp in from the window edges.
+            .padding(start = 12.dp, end = 12.dp, bottom = 12.dp, top = 6.dp)
     ) {
-        MillenniumSeparator(modifier = Modifier.fillMaxWidth())
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .clip(panelShape)
+                .border(1.dp, AppTheme.colors.outline.copy(alpha = 0.55f), panelShape)
                 .hazeEffect(state = hazeState) {
                     blurEffect {
                         blurRadius = 20.dp
@@ -320,12 +325,12 @@ fun AppLargePlayer(
                     ) {
                         Text(
                             text = formatPlayerTime(playerUiState.position),
-                            style = AppTheme.typography.labelSmall,
+                            style = AppTheme.typography.time,
                             color = AppTheme.colors.onSurfaceVariant
                         )
                         Text(
                             text = formatPlayerTime(playerUiState.displayDuration),
-                            style = AppTheme.typography.labelSmall,
+                            style = AppTheme.typography.time,
                             color = AppTheme.colors.onSurfaceVariant
                         )
                     }

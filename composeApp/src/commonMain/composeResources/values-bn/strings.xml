@@ -165,9 +165,9 @@
     <string name="settings_palette_dialog_description">একটি Millennium অ্যাকসেন্ট প্যালেট বেছে নিন এবং লাইট ও ডার্কে প্রিভিউ দেখুন।</string>
     <string name="settings_palette_label">প্যালেট</string>
     <string name="settings_appearance_subtitle_palette">Millennium প্যালেট ও অ্যাকসেন্ট। বর্তমান: %1$s</string>
-    <string name="settings_palette_blue">নীল</string>
-    <string name="settings_palette_orange">কমলা</string>
-    <string name="settings_palette_lime">লাইম</string>
+    <string name="settings_palette_blue">Flux</string>
+    <string name="settings_palette_orange">Braise</string>
+    <string name="settings_palette_lime">Prisme</string>
 
     <string name="settings_download_folder_title">ডাউনলোড ফোল্ডার পরিবর্তন</string>
     <string name="settings_download_folder_current">বর্তমান ফোল্ডার: %1$s</string>

@@ -163,9 +163,9 @@
     <string name="settings_palette_dialog_description">Chọn bảng màu nhấn Millennium và xem trước ở chế độ sáng và tối.</string>
     <string name="settings_palette_label">Bảng màu</string>
     <string name="settings_appearance_subtitle_palette">Bảng màu Millennium và màu nhấn. Hiện tại: %1$s</string>
-    <string name="settings_palette_blue">Xanh lam</string>
-    <string name="settings_palette_orange">Cam</string>
-    <string name="settings_palette_lime">Xanh chanh</string>
+    <string name="settings_palette_blue">Flux</string>
+    <string name="settings_palette_orange">Braise</string>
+    <string name="settings_palette_lime">Prisme</string>
 
     <string name="settings_download_folder_title">Thư mục tải xuống tùy chỉnh</string>
     <string name="settings_download_folder_current">Thư mục hiện tại: %1$s</string>
