@@ -73,11 +73,12 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       # compose-webview is a commonMain dependency resolved from mavenLocal (0.1.0-SNAPSHOT).
+      # Its desktop (WebKitGTK) native library is not needed for the APK, so skip building it.
       - name: Publish compose-webview to mavenLocal
         working-directory: compose-webview
         run: |
           chmod +x gradlew
-          ./gradlew publishToMavenLocal --no-configuration-cache
+          ./gradlew publishToMavenLocal --no-configuration-cache -x :webview-compose:buildNativeLinux
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
