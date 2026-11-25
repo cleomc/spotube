@@ -4,7 +4,7 @@ name: Flux Android APK
 #
 # - Push to master        -> APK attached to the rolling pre-release "flux-latest".
 # - Push a tag "v*"       -> APK attached to a release for that tag.
-# - Pull request          -> APK uploaded as a workflow artifact only.
+# - Pull request          -> same as a push to master (PRs from forks: workflow artifact only).
 # - Manual run            -> same as a push to master.
 #
 # Signing: add the repository secrets KEYSTORE (base64 of a .jks), KEYSTORE_PASSWORD,
@@ -142,7 +142,8 @@ jobs:
   release:
     name: Publish GitHub release
     needs: build-apk
-    if: github.event_name != 'pull_request'
+    # PRs from this repository publish too (fork PRs get a read-only token, so they don't).
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -172,10 +173,13 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           APK: ${{ needs.build-apk.outputs.apk-name }}
+          # On a PR, GITHUB_SHA is a temporary merge commit: point the release at the branch head.
+          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          SOURCE: ${{ github.head_ref || github.ref_name }}
         run: |
           gh release delete flux-latest --cleanup-tag --yes || true
           gh release create flux-latest "$APK" \
             --prerelease \
-            --target "$GITHUB_SHA" \
+            --target "$SHA" \
             --title "Spotube Flux (latest build)" \
-            --notes "Latest Android build of the Flux redesign, from commit ${GITHUB_SHA::7}. Install the APK on your phone (allow installs from unknown sources)."
+            --notes "Latest Android build of the Flux redesign, from ${SOURCE} at commit ${SHA::7}. Install the APK on your phone (allow installs from unknown sources)."
