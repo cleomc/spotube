@@ -69,7 +69,8 @@ jobs:
         uses: android-actions/setup-android@v4
 
       - name: Set up Rust
-        uses: dtolnay/rust-toolchain@stable
+        # Pinned: Gobley fails to read build-script outputs with the rustc 1.100 target layout.
+        uses: dtolnay/rust-toolchain@1.99.1
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
