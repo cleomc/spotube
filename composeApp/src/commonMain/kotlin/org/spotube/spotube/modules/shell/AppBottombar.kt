@@ -103,6 +103,7 @@ fun AppBottombar(
         BoxWithConstraints(Modifier.fillMaxSize()) {
             val count = tabs.size.coerceAtLeast(1)
             val slot = maxWidth / count
+            val slotHeight = maxHeight
             val target = selectedIndex.coerceAtLeast(0).toFloat()
             // Bubble edges in slot units, animated separately for the liquid stretch.
             val leading = remember { Animatable(target) }
@@ -156,7 +157,7 @@ fun AppBottombar(
                     BottomTab(
                         tab = tab,
                         selected = index == selectedIndex,
-                        modifier = Modifier.size(slot, maxHeight),
+                        modifier = Modifier.size(slot, slotHeight),
                         onClick = { navigator.navigate(tab.route) },
                         badge = if (tab.route == Routes.Library) libraryBadge else null,
                     )
