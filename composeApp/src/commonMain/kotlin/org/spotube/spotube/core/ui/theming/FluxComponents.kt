@@ -39,6 +39,8 @@ import org.spotube.millennium.composables.MillenniumSidebarTheme
 import org.spotube.millennium.composables.MillenniumSliderTheme
 import org.spotube.millennium.composables.MillenniumTabGroupTheme
 import org.spotube.millennium.composables.MillenniumTextFieldTheme
+import org.spotube.millennium.composables.MillenniumSeparatorTheme
+import org.spotube.millennium.composables.defaultMillenniumSeparatorTheme
 import org.spotube.millennium.composables.MillenniumTextTheme
 import org.spotube.millennium.composables.MillenniumToggleSwitchTheme
 import org.spotube.millennium.composables.MillenniumTopAppBarTheme
@@ -287,7 +289,9 @@ fun fluxThemeComponents(
     val textField = defaultMillenniumTextFieldTheme().let { t ->
         MillenniumTextFieldTheme(states = t.states.mapStates { state, p ->
             p.copy(
-                background = insetFill,
+                background = Brush.verticalGradient(
+                    listOf(colors.inset.copy(alpha = 0.72f), colors.inset.copy(alpha = 0.48f))
+                ),
                 shape = Small,
                 textStyle = type.bodyMedium,
                 labelStyle = type.labelMedium,
@@ -296,9 +300,9 @@ fun fluxThemeComponents(
                 placeholderColor = colors.muted,
                 cursorColor = colors.accent,
                 borderColor = when (state) {
-                    MillenniumControlState.Focused -> colors.accentTop
+                    MillenniumControlState.Focused -> colors.accent
                     MillenniumControlState.Error -> colors.danger
-                    else -> colors.border.copy(alpha = 0.55f)
+                    else -> colors.accent.copy(alpha = 0.22f)
                 },
                 insetShadeColor = Clear,
                 innerGlowColor = Clear,
@@ -310,9 +314,11 @@ fun fluxThemeComponents(
     val card = defaultMillenniumCardTheme().let { t ->
         MillenniumCardTheme(states = t.states.mapStates { _, p ->
             p.copy(
-                background = SolidColor(colors.surface),
+                background = Brush.verticalGradient(
+                    listOf(colors.raised.copy(alpha = 0.58f), colors.surface.copy(alpha = 0.40f))
+                ),
                 shape = Medium,
-                borderColor = colors.border.copy(alpha = 0.35f),
+                borderColor = colors.text.copy(alpha = 0.10f),
                 innerGlowColor = Clear,
                 bottomRimColor = Clear,
                 contentTextStyle = type.bodyMedium,
@@ -328,16 +334,24 @@ fun fluxThemeComponents(
                 subtitleForeground = colors.muted,
                 background = when (state) {
                     MillenniumControlState.Hovered, MillenniumControlState.Focused,
-                    MillenniumControlState.Pressed -> SolidColor(colors.raised)
+                    MillenniumControlState.Pressed -> SolidColor(colors.raised.copy(alpha = 0.55f))
                     else -> null
                 },
-                selectedBackground = flux,
-                selectedTitleForeground = colors.onAccent,
-                selectedSubtitleForeground = colors.onAccent.copy(alpha = 0.8f),
+                selectedBackground = Brush.horizontalGradient(
+                    listOf(colors.accentTop.copy(alpha = 0.30f), colors.accentTop.copy(alpha = 0.06f), Clear)
+                ),
+                selectedTitleForeground = colors.accent,
+                selectedSubtitleForeground = colors.muted,
                 shape = Small,
                 borderColor = Clear,
                 innerGlowColor = Clear,
             )
+        })
+    }
+
+    val separator = defaultMillenniumSeparatorTheme().let { t ->
+        MillenniumSeparatorTheme(states = t.states.mapStates { _, p ->
+            p.copy(color = colors.text.copy(alpha = 0.07f), highlightColor = Clear)
         })
     }
 
@@ -481,6 +495,7 @@ fun fluxThemeComponents(
         textFieldTheme = textField,
         cardTheme = card,
         listTileTheme = listTile,
+        separatorTheme = separator,
         dialogTheme = dialog,
         dropdownMenuTheme = dropdown,
         modalBottomSheetTheme = sheet,

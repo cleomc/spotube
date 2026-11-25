@@ -28,6 +28,11 @@ import org.spotube.spotube.core.ui.component.sharedElementOrNone
 import org.spotube.spotube.core.ui.misc.TextWithShimmer
 import org.spotube.spotube.core.ui.misc.shimmerApply
 import org.spotube.spotube.core.ui.theming.AppTheme
+import org.spotube.spotube.core.ui.theming.FluxPlayPauseIcon
+import org.spotube.spotube.core.ui.theming.fluxCard
+import org.spotube.spotube.core.ui.theming.fluxNeonBorder
+import org.spotube.spotube.core.ui.theming.fluxPress
+import androidx.compose.ui.graphics.Color
 import org.spotube.spotube.resources.iconsax.Iconsax
 import org.spotube.spotube.resources.iconsax.IconsaxAddSquare
 import org.spotube.spotube.resources.iconsax.IconsaxMusic
@@ -67,13 +72,18 @@ fun PlayableListTile(
     compact: Boolean = false
 ) {
     val colors = MillenniumTheme.colors
+    val tileShape = RoundedCornerShape(if (compact) 14.dp else 18.dp)
+    // Flux: a glass tile with a specular rim; the playing one gets a spinning holographic border.
     MillenniumListTile(
-        modifier = modifier,
+        modifier = modifier
+            .fluxPress(0.98f)
+            .fluxNeonBorder(tileShape, intensity = if (isPlaying) 1f else 0f)
+            .fluxCard(tileShape),
         onClick = onClick ?: onPlay,
         selected = isPlaying,
-        background = if (isPlaying) null else millenniumPanelBrush(colors),
-        shape = RoundedCornerShape(12.dp),
-        borderColor = if (isBlacklisted) colors.danger.copy(alpha = 0.5f) else if (isPlaying) null else colors.border,
+        background = null,
+        shape = tileShape,
+        borderColor = if (isBlacklisted) colors.danger.copy(alpha = 0.5f) else Color.Transparent,
         titleForeground = if (isBlacklisted) colors.danger else null,
         borderWidth = 1.dp,
         contentPadding = PaddingValues(if (compact) 8.dp else 12.dp),
@@ -134,10 +144,11 @@ fun PlayableListTile(
                             modifier = Modifier.size(if (compact) 32.dp else 40.dp),
                             style = MillenniumIconButtonStyle.Primary
                         ) {
-                            MillenniumIcon(
-                                if (isPlaying) Iconsax.IconsaxPause else Iconsax.IconsaxPlay,
-                                stringResource(if (isPlaying) Res.string.player_pause_content_description else Res.string.player_play_content_description),
-                                tint = LocalTextStyle.current.color
+                            FluxPlayPauseIcon(
+                                playing = isPlaying,
+                                contentDescription = stringResource(if (isPlaying) Res.string.player_pause_content_description else Res.string.player_play_content_description),
+                                color = LocalTextStyle.current.color,
+                                modifier = Modifier.size(if (compact) 14.dp else 16.dp)
                             )
                         }
                     }
@@ -160,7 +171,7 @@ internal fun MediaArtwork(
         modifier.millenniumSurface(
             background = millenniumBevelBrush(MillenniumTheme.colors),
             shape = shape,
-            borderColor = MillenniumTheme.colors.border,
+            borderColor = MillenniumTheme.colors.text.copy(alpha = 0.14f),
             borderWidth = 1.dp
         ).clip(shape).shimmerApply(),
         contentAlignment = Alignment.Center

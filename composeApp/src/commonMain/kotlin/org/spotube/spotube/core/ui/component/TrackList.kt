@@ -20,6 +20,9 @@ package org.spotube.spotube.core.ui.component
 
 
 import org.spotube.spotube.core.ui.theming.fluxBackground
+import org.spotube.spotube.core.ui.theming.FluxEqualizer
+import org.spotube.spotube.core.ui.theming.fluxPlayingBar
+import org.spotube.spotube.core.ui.theming.fluxEnter
 import com.composeunstyled.currentWindowWidthBreakpoint
 import org.spotube.millennium.adaptive.WindowBreakpoints
 import androidx.compose.animation.AnimatedContent
@@ -534,7 +537,7 @@ fun TrackList(
                 // Plugin ids can repeat (the same track twice in a playlist).
                 val rowKeys = uniqueLazyKeys(visibleTracks) { it.id }
                 items(visibleTracks.size, key = { TrackCardRowKeyPrefix + rowKeys[it] }) { displayedIndex ->
-                    Column(Modifier.fillMaxWidth()) {
+                    Column(Modifier.fillMaxWidth().fluxEnter(displayedIndex)) {
                         if (displayedIndex > 0) {
                             MillenniumSeparator()
                         }
@@ -643,7 +646,7 @@ private fun TrackListRow(
     }
 
     MillenniumListTile(
-        modifier = modifier,
+        modifier = modifier.fluxPlayingBar(isCurrentTrack),
         selected = isSelected || isCurrentTrack,
         onClick = onTrackClick,
         title = {
@@ -716,7 +719,16 @@ private fun TrackListRow(
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize().shimmerApply())
 
-                    if (isArtworkHovered || isCurrentTrack) {
+                    if (isCurrentTrack && isCurrentTrackPlaying && !isArtworkHovered) {
+                        // Flux: the playing row's artwork shows the dancing equalizer.
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Black.copy(alpha = 0.45f)),
+                            contentAlignment = Alignment.Center) {
+                            FluxEqualizer(playing = true)
+                        }
+                    } else if (isArtworkHovered || isCurrentTrack) {
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()

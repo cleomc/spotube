@@ -18,6 +18,10 @@
 package org.spotube.spotube.modules.shell
 
 import org.spotube.spotube.core.ui.theming.fluxBackground
+import org.spotube.spotube.core.ui.theming.LocalFluxHaze
+import org.spotube.spotube.core.ui.theming.ProvideFluxPlayback
+import org.spotube.spotube.core.audioplayer.AudioPlayerInterface
+import org.spotube.spotube.core.audioplayer.PlayerState
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -135,6 +139,10 @@ fun AppShell(
     ConnectionRequestDialogHost()
     PlayDestinationPickerHost()
 
+    // Flux: the aurora, ribbons and halos breathe with playback.
+    val audioPlayer: AudioPlayerInterface = koinInject()
+    val playerState by audioPlayer.playerStateFlow.collectAsState()
+    ProvideFluxPlayback(playing = playerState == PlayerState.PLAYING) {
     Box(modifier = Modifier.fillMaxSize()) {
         val useSidebar = viewModel.useSidebar()
         val chromeUiState by viewModel.compactChromeUiState.collectAsState()
@@ -290,6 +298,7 @@ fun AppShell(
                 .padding(bottom = bottomOverlayInset + 12.dp)
         )
     }
+    }
 }
 
 @OptIn(
@@ -373,8 +382,13 @@ internal fun CompactPlayerOverlay(
     var expandedPlayerComposed by remember { mutableStateOf(false) }
     if (expandedPlayerVisible) expandedPlayerComposed = true
 
+    // Flux: the floating player and the bottom bar blur the screen content behind them.
+    val contentHaze = rememberHazeState()
+    CompositionLocalProvider(LocalFluxHaze provides contentHaze) {
     Box(modifier = Modifier.fillMaxSize()) {
-        content()
+        Box(modifier = Modifier.fillMaxSize().hazeSource(contentHaze)) {
+            content()
+        }
 
         UnstyledBottomSheet(
             state = sheetState,
@@ -418,6 +432,7 @@ internal fun CompactPlayerOverlay(
                 .graphicsLayer {
                     alpha = viewModel.floatingPlayerAlpha(progress)
                 })
+    }
     }
 }
 

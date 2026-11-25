@@ -17,31 +17,68 @@
 
 package org.spotube.spotube.modules.shell
 
-import org.spotube.spotube.core.ui.theming.fluxGlass
-import org.spotube.spotube.core.ui.theming.AppTheme
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
-import com.composeunstyled.LocalTextStyle
-import com.composeunstyled.Text
-import org.spotube.millennium.composables.MillenniumBottomNavigationBar
-import org.spotube.millennium.composables.MillenniumBottomNavigationItem
-import org.spotube.millennium.composables.MillenniumIcon
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import org.spotube.millennium.theme.MillenniumTheme
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import org.spotube.spotube.NavigationItem
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import com.composeunstyled.Text
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import org.spotube.millennium.composables.MillenniumIcon
+import org.spotube.spotube.NavigationItem
 import org.spotube.spotube.bottombarTabs
 import org.spotube.spotube.core.navigation.NavigationState
 import org.spotube.spotube.core.navigation.Navigator
 import org.spotube.spotube.core.navigation.Routes
+import org.spotube.spotube.core.ui.theming.AppTheme
+import org.spotube.spotube.core.ui.theming.fluxGlass
+import org.spotube.spotube.core.ui.theming.fluxPress
 import org.spotube.spotube.modules.downloads.DownloadBadgeIndicator
 
+private val BarHeight = 68.dp
+private val BarPadding = 6.dp
+
+/**
+ * Floating fluted-glass capsule with a liquid flux bubble: the bubble's leading edge springs to
+ * the new tab first and its trailing edge follows, so it stretches while it travels and settles
+ * back into a pill with a little wobble.
+ */
 @Composable
 fun AppBottombar(
     navigator: Navigator,
@@ -49,56 +86,142 @@ fun AppBottombar(
     modifier: Modifier = Modifier,
     libraryBadge: @Composable () -> Unit = { DownloadBadgeIndicator() }
 ) {
-    // The selected tab keeps the flux fill in every interaction state (the library would fall
-    // back to its gel while the selected tab is pressed or hovered).
-    val baseTheme = MillenniumTheme.bottomNavigationBarTheme
+    val tabs = remember { bottombarTabs.filterIsInstance<NavigationItem.Tab<*>>() }
+    val selectedIndex = tabs.indexOfFirst { it.route == navigationState.topLevelRoute }
+    val flux = AppTheme.flux
     val fluxBrush = AppTheme.fluxBrush
-    val selectedTheme = remember(baseTheme, fluxBrush) {
-        val item = baseTheme.item
-        baseTheme.copy(
-            item = item.copy(
-                default = item.default.copy(background = fluxBrush),
-                hovered = item.hovered.copy(background = fluxBrush),
-                focused = item.focused.copy(background = fluxBrush),
-                pressed = item.pressed.copy(background = fluxBrush),
-                disabled = item.disabled.copy(background = fluxBrush),
-                selected = item.selected.copy(background = fluxBrush),
-                error = item.error.copy(background = fluxBrush),
-            )
-        )
-    }
 
-    // Floating fluted-glass pill, 12dp in from the edges and above the system navigation bar.
-    MillenniumBottomNavigationBar(
+    Box(
         modifier = modifier
             .windowInsetsPadding(WindowInsets.navigationBars)
-            .padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
-            .fluxGlass(CircleShape),
-        windowInsets = WindowInsets(0, 0, 0, 0)
+            .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+            .fillMaxWidth()
+            .height(BarHeight)
+            .fluxGlass(CircleShape, neon = 0.55f)
+            .padding(BarPadding)
     ) {
-        bottombarTabs.filterIsInstance<NavigationItem.Tab<*>>()
-            .forEach { tab ->
-                val selected = navigationState.topLevelRoute == tab.route
-                val title = stringResource(tab.title)
-                MillenniumBottomNavigationItem(
-                    selected = selected,
-                    theme = if (selected) selectedTheme else baseTheme,
-                    onClick = { navigator.navigate(tab.route) },
-                    contentDescription = title,
-                    icon = {
-                        MillenniumIcon(
-                            imageVector = tab.icon,
-                            contentDescription = null,
-                            tint = LocalTextStyle.current.color
-                        )
-                    },
-                    label = { Text(title) },
-                    badge = if (tab.route == Routes.Library) {
-                        libraryBadge
-                    } else {
-                        null
-                    }
-                )
+        BoxWithConstraints(Modifier.fillMaxSize()) {
+            val count = tabs.size.coerceAtLeast(1)
+            val slot = maxWidth / count
+            val target = selectedIndex.coerceAtLeast(0).toFloat()
+            // Bubble edges in slot units, animated separately for the liquid stretch.
+            val leading = remember { Animatable(target) }
+            val trailing = remember { Animatable(target) }
+            LaunchedEffect(target) {
+                coroutineScope {
+                    val fast = spring<Float>(dampingRatio = 0.62f, stiffness = 520f)
+                    val slow = spring<Float>(dampingRatio = 0.55f, stiffness = 190f)
+                    val movingRight = target > leading.value
+                    launch { leading.animateTo(target, if (movingRight) fast else slow) }
+                    launch { trailing.animateTo(target, if (movingRight) slow else fast) }
+                }
             }
+            val bubbleAlpha by animateFloatAsState(if (selectedIndex >= 0) 1f else 0f, tween(160))
+
+            Box(
+                Modifier.fillMaxSize().drawBehind {
+                    if (bubbleAlpha <= 0f) return@drawBehind
+                    val slotPx = size.width / count
+                    val left = minOf(leading.value, trailing.value) * slotPx
+                    val right = (maxOf(leading.value, trailing.value) + 1f) * slotPx
+                    val stretch = (right - left) / slotPx - 1f
+                    // Squash across the motion axis while stretched (94 % at full stretch).
+                    val squash = size.height * 0.06f * stretch.coerceIn(0f, 1f)
+                    val top = squash / 2f
+                    val h = size.height - squash
+                    val r = CornerRadius(h / 2f, h / 2f)
+                    // Bloom, then the flux fill, then a glossy top highlight.
+                    drawRoundRect(
+                        color = flux.accentTop, topLeft = Offset(left - 4f, top + 6f),
+                        size = Size(right - left + 8f, h), cornerRadius = r, alpha = 0.35f * bubbleAlpha,
+                    )
+                    drawRoundRect(
+                        brush = fluxBrush, topLeft = Offset(left, top),
+                        size = Size(right - left, h), cornerRadius = r, alpha = bubbleAlpha,
+                    )
+                    drawRoundRect(
+                        brush = androidx.compose.ui.graphics.Brush.verticalGradient(
+                            0f to androidx.compose.ui.graphics.Color.White.copy(alpha = 0.32f),
+                            0.5f to androidx.compose.ui.graphics.Color.Transparent,
+                            startY = top, endY = top + h,
+                        ),
+                        topLeft = Offset(left, top), size = Size(right - left, h),
+                        cornerRadius = r, alpha = bubbleAlpha,
+                    )
+                }
+            )
+
+            Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.Start) {
+                tabs.forEachIndexed { index, tab ->
+                    BottomTab(
+                        tab = tab,
+                        selected = index == selectedIndex,
+                        modifier = Modifier.size(slot, maxHeight),
+                        onClick = { navigator.navigate(tab.route) },
+                        badge = if (tab.route == Routes.Library) libraryBadge else null,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun BottomTab(
+    tab: NavigationItem.Tab<*>,
+    selected: Boolean,
+    modifier: Modifier,
+    onClick: () -> Unit,
+    badge: (@Composable () -> Unit)?,
+) {
+    val colors = AppTheme.colors
+    val title = stringResource(tab.title)
+    val tint by animateColorAsState(
+        if (selected) colors.onPrimary else colors.onSurfaceVariant, tween(160), label = "tab-tint"
+    )
+    val lift by animateFloatAsState(
+        if (selected) 1f else 0f,
+        spring(dampingRatio = 0.5f, stiffness = 380f),
+        label = "tab-lift",
+    )
+    Column(
+        modifier = modifier
+            .fluxPress(0.9f)
+            .semantics { this.selected = selected }
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                role = Role.Tab,
+                onClick = onClick,
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Box {
+            MillenniumIcon(
+                imageVector = tab.icon,
+                contentDescription = null,
+                tint = tint,
+                modifier = Modifier
+                    .size(22.dp)
+                    .graphicsLayer {
+                        val s = 1f + 0.1f * lift
+                        scaleX = s; scaleY = s
+                        translationY = -2.dp.toPx() * lift
+                        rotationZ = -8f * lift * (1f - lift) * 4f
+                    }
+            )
+            if (badge != null) {
+                Box(Modifier.align(Alignment.TopEnd).offset(x = 6.dp, y = (-4).dp)) { badge() }
+            }
+        }
+        Text(
+            text = title,
+            style = AppTheme.typography.labelSmall,
+            color = tint,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(top = 2.dp, start = 2.dp, end = 2.dp),
+        )
     }
 }

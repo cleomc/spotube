@@ -18,6 +18,12 @@
 package org.spotube.spotube.modules.shell
 
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.ui.graphics.graphicsLayer
+import org.spotube.spotube.core.ui.theming.FluxPlayPauseIcon
+import org.spotube.spotube.core.ui.theming.fluxHalo
+import org.spotube.spotube.core.ui.theming.fluxPress
 import org.spotube.spotube.core.ui.theming.fluxBackground
 import org.spotube.millennium.composables.MillenniumIcon
 import androidx.compose.animation.AnimatedVisibilityScope
@@ -494,10 +500,19 @@ fun AppExpandedPlayer(
                     .padding(top = 20.dp, bottom = 24.dp),
                 contentAlignment = Alignment.Center
             ) {
+                // Flux: the cover breathes in when playback starts and sinks back when paused,
+                // wrapped in the spinning flow-colour halo.
+                val artScale by animateFloatAsState(
+                    if (playerUiState.isPlaying) 1f else 0.9f,
+                    spring(dampingRatio = 0.55f, stiffness = 260f),
+                    label = "art-breathe"
+                )
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(0.84f)
                         .aspectRatio(1f)
+                        .graphicsLayer { scaleX = artScale; scaleY = artScale }
+                        .fluxHalo(playerUiState.isPlaying, RoundedCornerShape(22.dp), width = 3.dp)
                         .then(albumArtModifier)
                         .clip(RoundedCornerShape(22.dp))
                         .background(AppTheme.colors.surfaceContainerHighest)
@@ -617,13 +632,14 @@ fun AppExpandedPlayer(
                     }
                     MillenniumIconButton(
                         onClick = ::onPlayPause,
-                        style = MillenniumIconButtonStyle.Primary
+                        style = MillenniumIconButtonStyle.Primary,
+                        modifier = Modifier.fluxPress(0.86f)
                     ) {
-                        MillenniumIcon(
-                            if (playerUiState.isPlaying) Iconsax.IconsaxPause else Iconsax.IconsaxPlay,
+                        FluxPlayPauseIcon(
+                            playing = playerUiState.isPlaying,
                             contentDescription = stringResource(if (playerUiState.isPlaying) Res.string.player_pause_content_description else Res.string.player_play_content_description),
-                            modifier = Modifier.size(30.dp),
-                            tint = LocalTextStyle.current.color
+                            color = LocalTextStyle.current.color,
+                            modifier = Modifier.size(26.dp)
                         )
                     }
                     MillenniumIconButton(

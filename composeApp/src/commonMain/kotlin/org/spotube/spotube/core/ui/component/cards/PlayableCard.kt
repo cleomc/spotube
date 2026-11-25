@@ -18,6 +18,8 @@
 package org.spotube.spotube.core.ui.component.cards
 
 
+import org.spotube.spotube.core.ui.theming.FluxPlayPauseIcon
+import org.spotube.spotube.core.ui.theming.fluxHalo
 import org.spotube.millennium.composables.MillenniumIcon
 import org.spotube.millennium.composables.MillenniumIconButton
 import org.spotube.millennium.composables.MillenniumIconButtonStyle
@@ -113,6 +115,7 @@ fun PlayableCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(1f)
+                        .fluxHalo(isPlaying, RoundedCornerShape(14.dp))
                         .clip(RoundedCornerShape(14.dp))
                         .sharedElementOrNone(
                             key = sharedElementKey,
@@ -163,18 +166,17 @@ fun PlayableCard(
                                         style = MillenniumIconButtonStyle.Primary
 
                                     ) {
-                                        MillenniumIcon(
-                                            imageVector = if (isPlaying) {
-                                                Iconsax.IconsaxPause
-                                            } else Iconsax.IconsaxPlay,
+                                        FluxPlayPauseIcon(
+                                            playing = isPlaying,
+                                            modifier = Modifier.size(14.dp),
+                                            color = LocalTextStyle.current.color,
                                             contentDescription = stringResource(
                                                 if (isPlaying) {
                                                     Res.string.player_pause_content_description
                                                 } else {
                                                     Res.string.player_play_content_description
                                                 }
-                                            ),
-                                            tint = LocalTextStyle.current.color
+                                            )
                                         )
                                     }
                                 }
