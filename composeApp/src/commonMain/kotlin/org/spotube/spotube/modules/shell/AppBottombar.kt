@@ -31,6 +31,8 @@ import org.spotube.millennium.composables.MillenniumBottomNavigationBar
 import org.spotube.millennium.composables.MillenniumBottomNavigationItem
 import org.spotube.millennium.composables.MillenniumIcon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import org.spotube.millennium.theme.MillenniumTheme
 import androidx.compose.ui.Modifier
 import org.spotube.spotube.NavigationItem
 import org.jetbrains.compose.resources.stringResource
@@ -47,6 +49,25 @@ fun AppBottombar(
     modifier: Modifier = Modifier,
     libraryBadge: @Composable () -> Unit = { DownloadBadgeIndicator() }
 ) {
+    // The selected tab keeps the flux fill in every interaction state (the library would fall
+    // back to its gel while the selected tab is pressed or hovered).
+    val baseTheme = MillenniumTheme.bottomNavigationBarTheme
+    val fluxBrush = AppTheme.fluxBrush
+    val selectedTheme = remember(baseTheme, fluxBrush) {
+        val item = baseTheme.item
+        baseTheme.copy(
+            item = item.copy(
+                default = item.default.copy(background = fluxBrush),
+                hovered = item.hovered.copy(background = fluxBrush),
+                focused = item.focused.copy(background = fluxBrush),
+                pressed = item.pressed.copy(background = fluxBrush),
+                disabled = item.disabled.copy(background = fluxBrush),
+                selected = item.selected.copy(background = fluxBrush),
+                error = item.error.copy(background = fluxBrush),
+            )
+        )
+    }
+
     // Floating fluted-glass pill, 12dp in from the edges and above the system navigation bar.
     MillenniumBottomNavigationBar(
         modifier = modifier
@@ -61,7 +82,7 @@ fun AppBottombar(
                 val title = stringResource(tab.title)
                 MillenniumBottomNavigationItem(
                     selected = selected,
-                    background = if (selected) AppTheme.fluxBrush else null,
+                    theme = if (selected) selectedTheme else baseTheme,
                     onClick = { navigator.navigate(tab.route) },
                     contentDescription = title,
                     icon = {

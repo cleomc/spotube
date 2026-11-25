@@ -106,7 +106,6 @@ fun fluxThemeComponents(
     val glow = listOf(colors.accentTop.copy(alpha = 0.55f), colors.accentBottom.copy(alpha = 0.45f))
     val raisedFill: Brush = SolidColor(colors.raised.copy(alpha = 0.70f))
     val insetFill: Brush = SolidColor(colors.inset)
-    )
     val label = type.labelLarge
     val base = defaultMillenniumThemeComponents()
 
