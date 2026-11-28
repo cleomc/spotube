@@ -1,64 +1,38 @@
+/*
+ * Copyright (C) 2026 Kingkor Roy Tirtho and Spotube Contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// Generated from the Spotube Flux echo icons (geometry from Lucide, ISC licence). Do not edit.
+
 package org.spotube.spotube.resources.iconsax
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.PathData
-import androidx.compose.ui.graphics.vector.group
-import androidx.compose.ui.graphics.vector.path
-import androidx.compose.ui.unit.dp
 
 val Iconsax.IconsaxTag: ImageVector
     get() {
-        if (_IconsaxTag != null) {
-            return _IconsaxTag!!
-        }
-        _IconsaxTag = ImageVector.Builder(
+        _IconsaxTag?.let { return it }
+        return fluxIcon(
             name = "IconsaxTag",
-            defaultWidth = 24.dp,
-            defaultHeight = 24.dp,
-            viewportWidth = 24f,
-            viewportHeight = 24f
-        ).apply {
-            group(
-                clipPathData = PathData {
-                    moveTo(0f, 0f)
-                    horizontalLineToRelative(24f)
-                    verticalLineToRelative(24f)
-                    horizontalLineToRelative(-24f)
-                    close()
-                }
-            ) {
-                path(
-                    fill = SolidColor(Color.White),
-                    fillAlpha = 0.4f,
-                    strokeAlpha = 0.4f
-                ) {
-                    moveTo(4.17f, 15.3f)
-                    lineTo(8.7f, 19.83f)
-                    curveTo(10.56f, 21.69f, 13.58f, 21.69f, 15.45f, 19.83f)
-                    lineTo(19.84f, 15.44f)
-                    curveTo(21.7f, 13.58f, 21.7f, 10.56f, 19.84f, 8.69f)
-                    lineTo(15.3f, 4.17f)
-                    curveTo(14.35f, 3.22f, 13.04f, 2.71f, 11.7f, 2.78f)
-                    lineTo(6.7f, 3.02f)
-                    curveTo(4.7f, 3.11f, 3.11f, 4.7f, 3.01f, 6.69f)
-                    lineTo(2.77f, 11.69f)
-                    curveTo(2.71f, 13.04f, 3.22f, 14.35f, 4.17f, 15.3f)
-                    close()
-                }
-                path(fill = SolidColor(Color.White)) {
-                    moveTo(9.5f, 12.38f)
-                    curveTo(11.091f, 12.38f, 12.38f, 11.091f, 12.38f, 9.5f)
-                    curveTo(12.38f, 7.91f, 11.091f, 6.62f, 9.5f, 6.62f)
-                    curveTo(7.91f, 6.62f, 6.62f, 7.91f, 6.62f, 9.5f)
-                    curveTo(6.62f, 11.091f, 7.91f, 12.38f, 9.5f, 12.38f)
-                    close()
-                }
-            }
-        }.build()
-
-        return _IconsaxTag!!
+            strokes = listOf(
+                "M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z",
+            ),
+            fills = listOf(
+                "M7 7.5a0.5 0.5 0 1 0 1 0a0.5 0.5 0 1 0 -1 0z",
+            ),
+        ).also { _IconsaxTag = it }
     }
 
 @Suppress("ObjectPropertyName")

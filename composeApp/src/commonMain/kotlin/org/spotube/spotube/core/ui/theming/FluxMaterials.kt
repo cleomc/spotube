@@ -30,7 +30,11 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -42,6 +46,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
@@ -53,6 +58,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas as GraphicsCanvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.LinearGradientShader
@@ -69,7 +75,10 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.VectorGroup
+import androidx.compose.ui.graphics.vector.VectorPath
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.contentDescription
@@ -82,6 +91,8 @@ import dev.chrisbanes.haze.blur.HazeColorEffect
 import dev.chrisbanes.haze.blur.blurEffect
 import dev.chrisbanes.haze.hazeEffect
 import kotlinx.coroutines.delay
+import org.spotube.spotube.resources.iconsax.FLUX_ICON_ECHO
+import org.spotube.spotube.resources.iconsax.FLUX_ICON_INK
 import kotlin.math.PI
 import kotlin.math.floor
 import kotlin.math.max
@@ -97,7 +108,7 @@ private const val TAU = (2 * PI).toFloat()
  */
 private val LocalFluxAmbient = staticCompositionLocalOf<State<Float>> { mutableFloatStateOf(0f) }
 
-/** Playback energy, 0 (paused) to 1 (playing), eased over the `flow` duration. Draw scopes only. */
+/** Playback energy, 0 (paused) to 1 (playing), eased over 1.2 s. Draw scopes only. */
 private val LocalFluxEnergy = staticCompositionLocalOf<State<Float>> { mutableFloatStateOf(0f) }
 
 /**
@@ -106,8 +117,8 @@ private val LocalFluxEnergy = staticCompositionLocalOf<State<Float>> { mutableFl
  */
 val LocalFluxHaze = staticCompositionLocalOf<HazeState?> { null }
 
-/** Long enough that the loop restart is never seen; every motion uses whole cycles of it. */
-private const val AMBIENT_LOOP_SECONDS = 26f * 32f * 38f / 16f * 3f
+/** Long enough that the loop restart is never seen; the aurora periods (34, 42, 50 s) divide it. */
+private const val AMBIENT_LOOP_SECONDS = 34f * 42f * 50f / 4f
 
 @Composable
 fun ProvideFluxAmbient(content: @Composable () -> Unit) {
@@ -124,181 +135,74 @@ fun ProvideFluxAmbient(content: @Composable () -> Unit) {
     CompositionLocalProvider(LocalFluxAmbient provides time, content = content)
 }
 
-/** Lets the aurora, ribbons, halos and equalizers react to playback. */
+/** Lets the aurora, scopes, glows and icon echoes react to playback. */
 @Composable
 fun ProvideFluxPlayback(playing: Boolean, content: @Composable () -> Unit) {
     val energy = animateFloatAsState(
         targetValue = if (playing) 1f else 0f,
-        animationSpec = tween(600, easing = FastOutSlowInEasing),
+        animationSpec = tween(1200, easing = FastOutSlowInEasing),
         label = "flux-energy",
     )
     CompositionLocalProvider(LocalFluxEnergy provides energy, content = content)
 }
 
-// ---------------------------------------------------------------------------------------------
-// Colour helpers
-// ---------------------------------------------------------------------------------------------
-
-private fun cyclic(colors: List<Color>, x: Float): Color {
-    val f = (x - floor(x)) * colors.size
-    val i = f.toInt() % colors.size
-    return lerp(colors[i], colors[(i + 1) % colors.size], f - floor(f))
-}
-
-/** A sweep gradient through [colors] that loops seamlessly; shift [phase] (0..1) to spin it. */
-internal fun flowSweep(center: Offset, phase: Float, colors: List<Color>): Brush {
-    val n = 12
-    val stops = Array(n + 1) { i ->
-        val t = i / n.toFloat()
-        t to cyclic(colors, t + phase)
-    }
-    return Brush.sweepGradient(*stops, center = center)
-}
-
-private fun FluxColors.flow() = listOf(flowA, flowC, flowB, accentTop)
-
-// ---------------------------------------------------------------------------------------------
-// Background: aurora, neon liquid ribbons, stars, retro grid, scanlines, grain
-// ---------------------------------------------------------------------------------------------
-
-private class Blob(
-    val x: Float, val y: Float, val radius: Float,
-    val period: Float, val phase: Float,
-)
-
-private val Blobs = listOf(
-    Blob(0.15f, 0.10f, 0.72f, 26f, 0.0f),
-    Blob(0.90f, 0.34f, 0.64f, 32f, 1.7f),
-    Blob(0.40f, 0.92f, 0.70f, 38f, 3.1f),
-)
-
-/** 0..1 kick at 120 bpm, sharp attack and soft decay, scaled by playback energy. */
+/** 0..1 pulse at 120 bpm (sharp attack, soft decay), scaled by playback energy. */
 private fun beat(time: Float, energy: Float): Float {
     val phase = (time * 2f) - floor(time * 2f)
     return energy * (1f - phase).pow(3)
 }
 
+/** The accent as thin light: accentTop to accentBottom, left to right. */
+private fun FluxColors.accentLine(width: Float): Brush =
+    Brush.horizontalGradient(listOf(accentTop, accentBottom), startX = 0f, endX = width)
+
+// ---------------------------------------------------------------------------------------------
+// Background: aurora and grain
+// ---------------------------------------------------------------------------------------------
+
+private class Light(
+    val x: Float, val y: Float, val radius: Float,
+    val period: Float, val phase: Float,
+)
+
+private val Lights = listOf(
+    Light(0.18f, 0.08f, 0.66f, 34f, 0.0f),
+    Light(0.88f, 0.40f, 0.60f, 42f, 1.7f),
+    Light(0.36f, 0.94f, 0.64f, 50f, 3.1f),
+)
+
+/**
+ * Three very soft lights drifting on 34 to 50 s loops. Nuit is tuned for OLED: the lights stay
+ * low (22 % at rest, 34 % playing) and fall to true black well before the edges.
+ */
 private fun DrawScope.drawAurora(flux: FluxColors, time: Float, energy: Float) {
     val colors = listOf(flux.flowA, flux.flowB, flux.flowC)
-    val strength = (if (flux.dark) 0.62f else 0.38f) * (0.62f + 0.38f * energy)
+    val strength = if (flux.dark) 0.22f + 0.12f * energy else 0.30f + 0.10f * energy
     val kick = beat(time, energy)
     val dim = max(size.width, size.height)
-    Blobs.forEachIndexed { i, blob ->
-        val angle = (time / blob.period) * TAU + blob.phase
-        val cx = (blob.x + 0.12f * sin(angle)) * size.width
-        val cy = (blob.y + 0.10f * sin(angle * 0.8f + 1.3f)) * size.height
-        val scale = (1.035f + 0.115f * sin(angle * 1.3f)) * (1f + 0.06f * kick)
-        val r = dim * blob.radius * scale
+    Lights.forEachIndexed { i, light ->
+        // Ease in-out back and forth, like the CSS alternate loop.
+        val u = 0.5f - 0.5f * kotlin.math.cos((time / light.period) * PI.toFloat() + light.phase)
+        val cx = (light.x + 0.10f * (u - 0.5f) * 2f) * size.width
+        val cy = (light.y + 0.08f * sin(u * PI.toFloat() + light.phase)) * size.height
+        val scale = (0.96f + 0.08f * u) * (if (i == 0) 1f + 0.035f * kick else 1f)
+        val r = dim * light.radius * scale
         drawCircle(
             brush = Brush.radialGradient(
                 0f to colors[i].copy(alpha = strength),
-                0.5f to colors[i].copy(alpha = strength * 0.38f),
+                0.45f to colors[i].copy(alpha = strength * 0.32f),
                 1f to Color.Transparent,
                 center = Offset(cx, cy),
                 radius = r,
             ),
             radius = r,
             center = Offset(cx, cy),
+            blendMode = if (flux.dark) BlendMode.SrcOver else BlendMode.Multiply,
         )
     }
 }
 
-/** Two glowing neon-liquid ribbons that flow across the window (the "neon liquid" moodboard). */
-private fun DrawScope.drawRibbons(flux: FluxColors, time: Float, energy: Float) {
-    val brush = Brush.linearGradient(
-        colors = listOf(flux.flowA, flux.flowC, flux.flowB, flux.flowC, flux.flowA),
-        start = Offset.Zero,
-        end = Offset(size.width, size.height),
-    )
-    val base = if (flux.dark) 1f else 0.55f
-    val steps = 56
-    repeat(2) { r ->
-        val path = Path()
-        val baseY = size.height * (0.24f + 0.44f * r)
-        val amp = size.height * (0.05f + 0.015f * energy)
-        val t = time * (0.35f + 0.1f * r)
-        for (i in 0..steps) {
-            val u = i / steps.toFloat()
-            val x = size.width * (-0.05f + 1.1f * u)
-            val y = baseY +
-                amp * sin(u * 5.2f + t + r * 2.1f) +
-                amp * 0.55f * sin(u * 11.3f - t * 1.6f + r) +
-                amp * 0.25f * sin(u * 23f + t * 2.4f)
-            if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
-        }
-        val a = base * (0.55f + 0.45f * energy) * (if (r == 0) 1f else 0.7f)
-        drawPath(path, brush, alpha = 0.05f * a, style = Stroke(34.dp.toPx(), cap = StrokeCap.Round))
-        drawPath(path, brush, alpha = 0.10f * a, style = Stroke(14.dp.toPx(), cap = StrokeCap.Round))
-        drawPath(path, brush, alpha = 0.22f * a, style = Stroke(5.dp.toPx(), cap = StrokeCap.Round))
-        drawPath(
-            path, Color.White, alpha = (if (flux.dark) 0.18f else 0.30f) * a,
-            style = Stroke(1.2.dp.toPx(), cap = StrokeCap.Round),
-        )
-    }
-}
-
-private class Star(val x: Float, val y: Float, val r: Float, val freq: Float, val phase: Float)
-
-private val Stars: List<Star> = Random(11).let { rnd ->
-    List(70) {
-        Star(
-            x = rnd.nextFloat(),
-            y = rnd.nextFloat() * 0.72f,
-            r = 0.5f + rnd.nextFloat().pow(3) * 1.6f,
-            freq = 0.4f + rnd.nextFloat() * 1.4f,
-            phase = rnd.nextFloat() * TAU,
-        )
-    }
-}
-
-/** Twinkling motes; the brightest throw a four-point sparkle. */
-private fun DrawScope.drawStars(flux: FluxColors, time: Float) {
-    val ink = if (flux.dark) Color.White else flux.flowC
-    val k = if (flux.dark) 1f else 0.5f
-    val unit = 1.dp.toPx()
-    Stars.forEach { s ->
-        val tw = (0.5f + 0.5f * sin(time * s.freq + s.phase)).pow(4)
-        val a = (0.12f + 0.78f * tw) * k
-        val c = Offset(s.x * size.width, s.y * size.height)
-        drawCircle(ink, radius = s.r * unit, center = c, alpha = a)
-        if (s.r > 1.4f && tw > 0.35f) {
-            val len = s.r * unit * 5f * tw
-            val sw = 0.8f * unit
-            drawLine(ink, c - Offset(len, 0f), c + Offset(len, 0f), sw, StrokeCap.Round, alpha = a * 0.7f)
-            drawLine(ink, c - Offset(0f, len), c + Offset(0f, len), sw, StrokeCap.Round, alpha = a * 0.7f)
-            drawCircle(flux.flowA, radius = s.r * unit * 4f, center = c, alpha = a * 0.12f)
-        }
-    }
-}
-
-/** A synthwave perspective grid rolling toward the viewer at the bottom of the window. */
-private fun DrawScope.drawRetroGrid(flux: FluxColors, time: Float, energy: Float) {
-    val horizon = size.height * 0.68f
-    val depth = size.height - horizon
-    val ink = flux.flowC
-    val base = (if (flux.dark) 0.16f else 0.12f) * (0.7f + 0.3f * energy)
-    val stroke = 1.dp.toPx()
-    val cx = size.width / 2f
-    for (i in -14..14) {
-        val xb = cx + i * size.width * 0.16f
-        val xt = cx + i * size.width * 0.012f
-        drawLine(
-            brush = Brush.verticalGradient(
-                0f to Color.Transparent, 1f to ink.copy(alpha = base),
-                startY = horizon, endY = size.height,
-            ),
-            start = Offset(xt, horizon), end = Offset(xb, size.height), strokeWidth = stroke,
-        )
-    }
-    val scroll = time * 0.22f
-    for (j in 0 until 12) {
-        val t = (j + scroll - floor(scroll)) / 12f
-        val y = horizon + depth * t.pow(2.2f)
-        drawLine(ink, Offset(0f, y), Offset(size.width, y), stroke, alpha = base * t)
-    }
-}
-
-private const val GRAIN_SIZE = 160
+private const val GRAIN_SIZE = 192
 
 /** A tile of film grain: random dots of [ink] at a few alpha levels on a transparent ground. */
 private fun grainTile(ink: Color): ImageBitmap {
@@ -317,7 +221,7 @@ private fun grainTile(ink: Color): ImageBitmap {
 }
 
 private fun DrawScope.drawGrain(flux: FluxColors, brush: ShaderBrush, time: Float) {
-    // Film-like jitter: six steps a second, each a different tile offset.
+    // Six steps a second, each a different tile offset.
     val step = (time * 6f).toInt()
     val dx = ((step * 37) % GRAIN_SIZE).toFloat()
     val dy = ((step * 61) % GRAIN_SIZE).toFloat()
@@ -326,16 +230,22 @@ private fun DrawScope.drawGrain(flux: FluxColors, brush: ShaderBrush, time: Floa
             brush = brush,
             topLeft = Offset.Zero,
             size = Size(size.width + dx, size.height + dy),
-            alpha = if (flux.dark) 0.07f else 0.11f,
+            // Kept faint on Nuit so OLED blacks stay black.
+            alpha = if (flux.dark) 0.035f else 0.09f,
             blendMode = if (flux.dark) BlendMode.Screen else BlendMode.Multiply,
         )
     }
 }
 
+@Composable
+private fun rememberGrainBrush(ink: Color): ShaderBrush = remember(ink) {
+    ShaderBrush(ImageShader(grainTile(ink), TileMode.Repeated, TileMode.Repeated))
+}
+
 /**
- * The Flux window ground: background colour, the drifting aurora (pulsing on the beat while
- * playing), neon-liquid ribbons, twinkling stars, a retro perspective grid, CRT scanlines and film
- * grain. Use it wherever a screen used to paint a flat `background` colour.
+ * The Flux window ground: the background colour, the aurora (rising and breathing while playing)
+ * and film grain. Use it wherever a screen used to paint a flat `background` colour. [decor] keeps
+ * the aurora; turn it off for plain panels.
  */
 @Composable
 fun Modifier.fluxBackground(grain: Boolean = true, decor: Boolean = true): Modifier {
@@ -343,104 +253,113 @@ fun Modifier.fluxBackground(grain: Boolean = true, decor: Boolean = true): Modif
     val background = AppTheme.colors.background
     val time = LocalFluxAmbient.current
     val energy = LocalFluxEnergy.current
-    val grainBrush = remember(flux.grainBlend) {
-        val tile = grainTile(flux.grainBlend)
-        ShaderBrush(ImageShader(tile, TileMode.Repeated, TileMode.Repeated))
-    }
+    val grainBrush = rememberGrainBrush(flux.grainBlend)
     return this.drawBehind {
         drawRect(background)
         val t = time.value
-        val e = energy.value
-        drawAurora(flux, t, e)
-        if (decor) {
-            drawRetroGrid(flux, t, e)
-            drawRibbons(flux, t, e)
-            drawStars(flux, t)
-            val pitch = 3.dp.toPx()
-            drawRect(
-                brush = ShaderBrush(
-                    LinearGradientShader(
-                        from = Offset.Zero, to = Offset(0f, pitch),
-                        colors = listOf(Color.Transparent, Color.Black.copy(alpha = if (flux.dark) 0.16f else 0.04f)),
-                        tileMode = TileMode.Repeated,
-                    )
-                )
-            )
-        }
+        if (decor) drawAurora(flux, t, energy.value)
         if (grain) drawGrain(flux, grainBrush, t)
     }
 }
 
 // ---------------------------------------------------------------------------------------------
-// Glass, rims and neon borders
+// Glass, hairlines and light
 // ---------------------------------------------------------------------------------------------
 
 /**
- * A spinning holographic border (the flow colours chasing each other around [shape]) with a soft
- * neon bloom. Apply it outside any `clip` so the bloom is not cut off.
+ * A thin accent line around [shape], the accent gradient slowly turning. [intensity] fades it in
+ * and out (0 draws nothing). Flux keeps the accent to thin light, so there is no bloom.
  */
 @Composable
 fun Modifier.fluxNeonBorder(
     shape: Shape,
-    width: Dp = 1.5.dp,
+    width: Dp = 1.dp,
     intensity: Float = 1f,
-    periodSeconds: Float = 6f,
+    periodSeconds: Float = 12f,
     behind: Boolean = false,
 ): Modifier {
     val flux = AppTheme.flux
     val time = LocalFluxAmbient.current
-    val colors = remember(flux) { flux.flow() }
     if (intensity <= 0f) return this
     fun DrawScope.ring() {
         val phase = time.value / periodSeconds
-        val outline = shape.createOutline(size, layoutDirection, this)
-        val brush = flowSweep(center, phase - floor(phase), colors)
-        val w = width.toPx()
-        drawOutline(outline, brush, alpha = 0.10f * intensity, style = Stroke(w * 7f))
-        drawOutline(outline, brush, alpha = 0.22f * intensity, style = Stroke(w * 3f))
-        drawOutline(outline, brush, alpha = intensity, style = Stroke(w))
+        val a = (phase - floor(phase)) * TAU
+        val dx = kotlin.math.cos(a) * size.width / 2f
+        val dy = sin(a) * size.height / 2f
+        val brush = Brush.linearGradient(
+            listOf(flux.accentTop, flux.accentBottom),
+            start = center - Offset(dx, dy),
+            end = center + Offset(dx, dy),
+        )
+        drawOutline(
+            shape.createOutline(size, layoutDirection, this), brush,
+            alpha = intensity, style = Stroke(width.toPx()),
+        )
     }
     return if (behind) drawBehind { ring() } else drawWithContent { drawContent(); ring() }
 }
 
-/** Spinning conic halo of the flow colours around playing artwork (cards, player). */
+/**
+ * `glow-art`: the light a cover casts under itself, in the flow colours, fading in over 600 ms
+ * while [active]. Apply it before the cover's `clip`.
+ */
 @Composable
 fun Modifier.fluxHalo(active: Boolean, shape: Shape, width: Dp = 2.5.dp): Modifier {
-    val a by animateFloatAsState(if (active) 1f else 0f, tween(600), label = "flux-halo")
-    return fluxNeonBorder(shape, width, intensity = a, periodSeconds = 4f, behind = true)
+    val flux = AppTheme.flux
+    val energy = LocalFluxEnergy.current
+    val time = LocalFluxAmbient.current
+    val a by animateFloatAsState(if (active) 1f else 0f, tween(600), label = "flux-glow")
+    return drawBehind {
+        if (a <= 0.01f) return@drawBehind
+        val breathe = 1f + 0.04f * beat(time.value, energy.value)
+        val w = size.width
+        val h = size.height
+        val strength = (if (flux.dark) 0.42f else 0.30f) * a
+        fun glow(color: Color, cx: Float, cy: Float, r: Float) = drawCircle(
+            brush = Brush.radialGradient(
+                0f to color.copy(alpha = strength), 1f to Color.Transparent,
+                center = Offset(cx, cy), radius = r,
+            ),
+            radius = r, center = Offset(cx, cy),
+        )
+        glow(flux.flowA, w * 0.32f, h * 0.82f, w * 0.62f * breathe)
+        glow(flux.flowB, w * 0.70f, h * 0.88f, w * 0.52f * breathe)
+    }
 }
 
-/** Glass rim: a specular top edge fading down to a faint warm bottom edge. */
+/** Glass edge: a 1dp hairline in `border` at 60 % with the `lift` highlight along the top. */
 @Composable
 fun Modifier.fluxRim(shape: Shape, strength: Float = 1f): Modifier {
     val flux = AppTheme.flux
+    val hair = AppTheme.colors.outline.copy(alpha = 0.6f * strength)
     return drawWithContent {
         drawContent()
         val outline = shape.createOutline(size, layoutDirection, this)
+        // Half of the stroke lies outside the clip, so 2dp shows as a 1dp hairline.
+        drawOutline(outline, hair, style = Stroke(2.dp.toPx()))
         drawOutline(
             outline,
             Brush.verticalGradient(
-                0f to Color.White.copy(alpha = (if (flux.dark) 0.30f else 0.75f) * strength),
-                0.45f to Color.White.copy(alpha = (if (flux.dark) 0.06f else 0.25f) * strength),
-                1f to flux.flowB.copy(alpha = 0.22f * strength),
+                0f to Color.White.copy(alpha = (if (flux.dark) 0.10f else 0.6f) * strength),
+                0.25f to Color.Transparent,
             ),
-            style = Stroke(2.dp.toPx()), // half of it is clipped away by the panel
+            style = Stroke(2.dp.toPx()),
         )
     }
 }
 
 /**
- * Fluted glass panel: blurs what is behind it (when a [LocalFluxHaze] source exists), tints it with
- * `glass`, adds 6dp flutes, a diagonal sheen and a specular rim, clipped to [shape]. [neon] adds the
- * spinning holographic border. The component on top must leave its own background transparent.
+ * Fine fluted glass: blurs what is behind it (when a [LocalFluxHaze] source exists) and tints it
+ * `glass`, then 1dp flutes every 4dp fading downward, a hairline and the top highlight, clipped to
+ * [shape]. [neon] adds a thin accent line around it. The component on top must leave its own
+ * background transparent.
  */
 @Composable
 fun Modifier.fluxGlass(shape: Shape, neon: Float = 0f): Modifier {
     val flux = AppTheme.flux
     val haze = LocalFluxHaze.current
-    val groove = AppTheme.colors.background.copy(alpha = 0.22f)
-    val fill = if (haze != null) flux.glass.copy(alpha = flux.glass.alpha * 0.55f)
-    else flux.glass.copy(alpha = max(flux.glass.alpha, if (flux.dark) 0.84f else 0.9f))
+    val fill = if (haze != null) flux.glass.copy(alpha = flux.glass.alpha * 0.5f)
+    else flux.glass.copy(alpha = max(flux.glass.alpha, if (flux.dark) 0.9f else 0.92f))
     val frosted = if (haze != null) Modifier.hazeEffect(state = haze) {
         blurEffect {
             blurRadius = 28.dp
@@ -448,80 +367,134 @@ fun Modifier.fluxGlass(shape: Shape, neon: Float = 0f): Modifier {
         }
     } else Modifier
     return this
-        .fluxNeonBorder(shape, intensity = neon)
+        .fluxNeonBorder(shape, intensity = neon * 0.6f)
         .clip(shape)
         .then(frosted)
         .drawBehind {
             drawRect(fill)
-            val pitch = 6.dp.toPx()
+            val pitch = 4.dp.toPx()
+            val rib = 1.dp.toPx() / pitch
             drawRect(
                 brush = ShaderBrush(
                     LinearGradientShader(
                         from = Offset.Zero,
                         to = Offset(pitch, 0f),
-                        colors = listOf(flux.rib, Color.Transparent, groove, Color.Transparent),
-                        colorStops = listOf(0f, 0.2f, 0.55f, 0.9f),
+                        colors = listOf(
+                            flux.rib.copy(alpha = flux.rib.alpha * 0.7f), flux.rib.copy(alpha = flux.rib.alpha * 0.7f),
+                            Color.Transparent, Color.Transparent,
+                        ),
+                        colorStops = listOf(0f, rib, rib, 1f),
                         tileMode = TileMode.Repeated,
                     )
                 )
             )
+            // Flutes fade toward the bottom.
             drawRect(brush = Brush.verticalGradient(0f to Color.Transparent, 1f to fill))
-            drawRect(
-                brush = Brush.linearGradient(
-                    0f to Color.White.copy(alpha = if (flux.dark) 0.10f else 0.35f),
-                    0.4f to Color.Transparent,
-                    start = Offset.Zero,
-                    end = Offset(size.width * 0.6f, size.height * 1.4f),
-                )
-            )
         }
         .fluxRim(shape)
 }
 
-/** Glass card ground for media tiles and content cards, lighter than [fluxGlass] (no flutes). */
+/**
+ * Card ground for content cards and tiles. Flux cards have no surface: this only adds a faint
+ * `raised` wash ([highlight] 0..1, for hover or the playing item) and a hairline.
+ */
 @Composable
 fun Modifier.fluxCard(shape: Shape, highlight: Float = 0f): Modifier {
-    val flux = AppTheme.flux
     val colors = AppTheme.colors
     return this
         .clip(shape)
         .drawBehind {
-            drawRect(
-                Brush.verticalGradient(
-                    0f to colors.surfaceContainerHigh.copy(alpha = 0.62f + 0.2f * highlight),
-                    1f to colors.surfaceContainer.copy(alpha = 0.42f + 0.2f * highlight),
-                )
-            )
-            drawRect(
-                brush = Brush.linearGradient(
-                    0f to Color.White.copy(alpha = if (flux.dark) 0.07f else 0.30f),
-                    0.35f to Color.Transparent,
-                    start = Offset.Zero,
-                    end = Offset(size.width * 0.5f, size.height * 1.5f),
-                )
+            drawRect(colors.onSurface.copy(alpha = 0.03f + 0.04f * highlight))
+            drawOutline(
+                shape.createOutline(size, layoutDirection, this),
+                colors.outline.copy(alpha = 0.35f + 0.2f * highlight),
+                style = Stroke(2.dp.toPx()),
             )
         }
-        .fluxRim(shape, strength = 0.7f + 0.3f * highlight)
 }
 
-/** Playing row marker: a 3dp glowing flux bar on the left edge (the list tile theme adds the wash). */
+/** A 1dp `hair` rule along the bottom edge: row separators and section ends. */
+@Composable
+fun Modifier.fluxHairline(): Modifier {
+    val hair = AppTheme.colors.outline.copy(alpha = 0.6f)
+    return drawBehind {
+        val w = 1.dp.toPx()
+        drawRect(hair, topLeft = Offset(0f, size.height - w), size = Size(size.width, w))
+    }
+}
+
+/** Playing row marker: a soft `text` 5 % wash with a 2dp accent tick on the left edge. */
 @Composable
 fun Modifier.fluxPlayingBar(active: Boolean): Modifier {
     val flux = AppTheme.flux
-    val brush = AppTheme.fluxBrush
-    val a by animateFloatAsState(if (active) 1f else 0f, tween(280), label = "flux-wash")
+    val wash = AppTheme.colors.onSurface
+    val a by animateFloatAsState(if (active) 1f else 0f, tween(280), label = "flux-playing-row")
     return drawBehind {
         if (a <= 0.01f) return@drawBehind
-        val w = 3.dp.toPx()
-        val inset = size.height * 0.2f
+        drawRect(wash.copy(alpha = 0.05f * a))
+        val w = 2.dp.toPx()
+        val inset = size.height * 0.28f
         drawRoundRect(
-            brush = brush, topLeft = Offset(0f, inset), size = Size(w, size.height - 2 * inset),
+            brush = Brush.verticalGradient(listOf(flux.accentTop, flux.accentBottom), inset, size.height - inset),
+            topLeft = Offset(0f, inset), size = Size(w, size.height - 2 * inset),
             cornerRadius = CornerRadius(w, w), alpha = a,
         )
-        drawRoundRect(
-            color = flux.accentTop, topLeft = Offset(0f, inset), size = Size(w * 4f, size.height - 2 * inset),
-            cornerRadius = CornerRadius(w * 2, w * 2), alpha = 0.25f * a,
-        )
+    }
+}
+
+/**
+ * Viewfinder corners: four 10dp marks 6dp outside the content in `text` at 70 %, settling from
+ * 104 % to 100 % as they appear. Apply before any `clip`.
+ */
+@Composable
+fun Modifier.fluxViewfinder(visible: Boolean): Modifier {
+    val ink = AppTheme.colors.onSurface
+    val a by animateFloatAsState(if (visible) 1f else 0f, tween(280), label = "flux-viewfinder")
+    return drawWithContent {
+        drawContent()
+        if (a <= 0.01f) return@drawWithContent
+        val gap = 6.dp.toPx() * (1f + 0.6f * (1f - a))
+        val len = 10.dp.toPx()
+        val sw = 1.2.dp.toPx()
+        val c = ink.copy(alpha = 0.7f * a)
+        val l = -gap
+        val t = -gap
+        val r = size.width + gap
+        val b = size.height + gap
+        listOf(
+            Triple(Offset(l, t), 1f, 1f), Triple(Offset(r, t), -1f, 1f),
+            Triple(Offset(l, b), 1f, -1f), Triple(Offset(r, b), -1f, -1f),
+        ).forEach { (p, sx, sy) ->
+            drawLine(c, p, p + Offset(len * sx, 0f), sw, StrokeCap.Round)
+            drawLine(c, p, p + Offset(0f, len * sy), sw, StrokeCap.Round)
+        }
+    }
+}
+
+/**
+ * The play disc's progress ring: a 1dp `hair` track and a 1.6dp accent arc [inset] outside the
+ * content, sweeping with [progress] (0..1, smoothed over 200 ms). Apply before any `clip`.
+ */
+@Composable
+fun Modifier.fluxProgressRing(progress: Float, inset: Dp = 7.dp): Modifier {
+    val flux = AppTheme.flux
+    val hair = AppTheme.colors.outline.copy(alpha = 0.6f)
+    val p by animateFloatAsState(progress.coerceIn(0f, 1f), tween(200, easing = LinearEasing), label = "flux-ring")
+    return drawBehind {
+        val o = inset.toPx()
+        val topLeft = Offset(-o, -o)
+        val s = Size(size.width + 2 * o, size.height + 2 * o)
+        drawArc(hair, 0f, 360f, false, topLeft, s, style = Stroke(1.dp.toPx()))
+        if (p > 0f) {
+            drawArc(
+                brush = Brush.sweepGradient(
+                    0f to flux.accentTop, 1f to flux.accentBottom, center = center,
+                ),
+                startAngle = -90f, sweepAngle = 360f * p, useCenter = false,
+                topLeft = topLeft, size = s,
+                style = Stroke(1.6.dp.toPx(), cap = StrokeCap.Round),
+            )
+        }
     }
 }
 
@@ -530,15 +503,15 @@ fun Modifier.fluxPlayingBar(active: Boolean): Modifier {
 // ---------------------------------------------------------------------------------------------
 
 /**
- * Squishy press feedback: scales down in 90 ms on touch and springs back with overshoot on
- * release. Observes the pointer without consuming it, so the wrapped control still gets the click.
+ * Squishy press feedback: scales down in 90 ms on touch and springs back on release. Observes the
+ * pointer without consuming it, so the wrapped control still gets the click.
  */
 @Composable
-fun Modifier.fluxPress(pressedScale: Float = 0.95f): Modifier {
+fun Modifier.fluxPress(pressedScale: Float = 0.97f): Modifier {
     var pressed by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
         targetValue = if (pressed) pressedScale else 1f,
-        animationSpec = if (pressed) tween(90) else spring(dampingRatio = 0.45f, stiffness = 380f),
+        animationSpec = if (pressed) tween(90) else spring(dampingRatio = 0.5f, stiffness = 420f),
         label = "flux-press",
     )
     return this
@@ -577,8 +550,6 @@ fun Modifier.fluxEnter(index: Int = 0): Modifier {
     return graphicsLayer {
         alpha = progress.value
         translationY = (1f - progress.value) * 12.dp.toPx()
-        val s = 0.97f + 0.03f * progress.value
-        scaleX = s; scaleY = s
     }
 }
 
@@ -586,39 +557,53 @@ fun Modifier.fluxEnter(index: Int = 0): Modifier {
 // Small animated pieces
 // ---------------------------------------------------------------------------------------------
 
-/** Four flux bars dancing while [playing]; they settle low and still when paused. */
+/**
+ * A live oscilloscope trace: a 1.6dp line in the accent gradient plus a ghost trace at 28 %,
+ * windowed by sin(πx) so it rests at both ends. Paused, it flattens over about 400 ms. Redrawn in
+ * the draw phase only.
+ */
 @Composable
-fun FluxEqualizer(playing: Boolean, modifier: Modifier = Modifier, brush: Brush? = null) {
+fun FluxScope(playing: Boolean, modifier: Modifier = Modifier, ghost: Boolean = true) {
+    val flux = AppTheme.flux
     val time = LocalFluxAmbient.current
-    val fill = brush ?: AppTheme.fluxBrush
-    val energy by animateFloatAsState(if (playing) 1f else 0f, tween(280), label = "flux-eq")
-    Canvas(modifier.size(16.dp, 14.dp)) {
-        val periods = floatArrayOf(0.7f, 1.1f, 0.85f, 0.95f)
-        val bw = 3.dp.toPx()
-        val gap = (size.width - 4 * bw) / 3f
-        for (i in 0 until 4) {
-            val p = 0.5f + 0.5f * sin(time.value * TAU / periods[i] + i * 1.3f)
-            val h = size.height * (0.22f + 0.78f * p * energy)
-            drawRoundRect(
-                brush = fill,
-                topLeft = Offset(i * (bw + gap), size.height - h),
-                size = Size(bw, h),
-                cornerRadius = CornerRadius(bw / 2, bw / 2),
-            )
+    val amp by animateFloatAsState(if (playing) 1f else 0f, tween(400), label = "flux-scope")
+    Canvas(modifier) {
+        val t = time.value
+        val k = beat(t, 1f)
+        val mid = size.height / 2f
+        val steps = (size.width / 1.5.dp.toPx()).toInt().coerceAtLeast(12)
+        fun trace(shift: Float, gain: Float): Path = Path().apply {
+            for (i in 0..steps) {
+                val u = i / steps.toFloat()
+                val window = sin(u * PI.toFloat())
+                val wave = sin(u * 13f + t * 7f + shift) * 0.6f +
+                    sin(u * 29f - t * 11f + shift * 2f) * 0.3f +
+                    sin(u * 5f + t * 3f) * 0.25f
+                val y = mid - wave * window * mid * 0.9f * amp * gain * (0.75f + 0.25f * k)
+                val x = u * size.width
+                if (i == 0) moveTo(x, y) else lineTo(x, y)
+            }
         }
+        val brush = flux.accentLine(size.width)
+        val style = Stroke(1.6.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round)
+        if (ghost) drawPath(trace(1.9f, 0.7f), brush, alpha = 0.28f, style = Stroke(1.dp.toPx()))
+        drawPath(trace(0f, 1f), brush, style = style)
     }
 }
 
-// Play triangle and pause bars as two quads each, with matching corners so they morph.
-private val PlayLeft = floatArrayOf(0.14f, 0.02f, 0.56f, 0.27f, 0.56f, 0.73f, 0.14f, 0.98f)
-private val PlayRight = floatArrayOf(0.56f, 0.27f, 0.98f, 0.50f, 0.98f, 0.50f, 0.56f, 0.73f)
-private val PauseLeft = floatArrayOf(0.14f, 0.04f, 0.42f, 0.04f, 0.42f, 0.96f, 0.14f, 0.96f)
-private val PauseRight = floatArrayOf(0.58f, 0.04f, 0.86f, 0.04f, 0.86f, 0.96f, 0.58f, 0.96f)
+/** The small scope shown before a playing title and in place of a playing row's number. */
+@Composable
+fun FluxEqualizer(playing: Boolean, modifier: Modifier = Modifier, brush: Brush? = null) {
+    FluxScope(playing = playing, modifier = modifier.size(22.dp, 14.dp), ghost = false)
+}
 
-/**
- * Play/pause as one shape morphing between a triangle and two bars (`smooth` with overshoot),
- * turning a quarter as it goes.
- */
+// Play triangle and pause bars as two quads each, with matching corners so they morph.
+private val PlayLeft = floatArrayOf(0.18f, 0.06f, 0.56f, 0.29f, 0.56f, 0.71f, 0.18f, 0.94f)
+private val PlayRight = floatArrayOf(0.56f, 0.29f, 0.94f, 0.50f, 0.94f, 0.50f, 0.56f, 0.71f)
+private val PauseLeft = floatArrayOf(0.20f, 0.08f, 0.40f, 0.08f, 0.40f, 0.92f, 0.20f, 0.92f)
+private val PauseRight = floatArrayOf(0.60f, 0.08f, 0.80f, 0.08f, 0.80f, 0.92f, 0.60f, 0.92f)
+
+/** Play/pause as one glyph morphing between a triangle and two bars, with a slight overshoot. */
 @Composable
 fun FluxPlayPauseIcon(
     playing: Boolean,
@@ -628,7 +613,7 @@ fun FluxPlayPauseIcon(
 ) {
     val t by animateFloatAsState(
         targetValue = if (playing) 1f else 0f,
-        animationSpec = spring(dampingRatio = 0.55f, stiffness = 420f),
+        animationSpec = spring(dampingRatio = 0.62f, stiffness = 420f),
         label = "flux-play-morph",
     )
     Canvas(
@@ -650,7 +635,7 @@ fun FluxPlayPauseIcon(
             }
             close()
         }
-        val round = Stroke(width = side * 0.09f, join = StrokeJoin.Round)
+        val round = Stroke(width = side * 0.08f, join = StrokeJoin.Round)
         listOf(quad(PlayLeft, PauseLeft), quad(PlayRight, PauseRight)).forEach { p ->
             drawPath(p, color)
             drawPath(p, color, style = round)
@@ -658,7 +643,101 @@ fun FluxPlayPauseIcon(
     }
 }
 
-/** The lowercase spotube wordmark, filled with the flux gradient. */
+/** A copy of this vector holding only the paths of its top-level group [name], or null. */
+private fun ImageVector.layer(name: String): ImageVector? {
+    val group = root.firstOrNull { it is VectorGroup && it.name == name } as? VectorGroup ?: return null
+    val builder = ImageVector.Builder(
+        name = "${this.name}-$name",
+        defaultWidth = defaultWidth,
+        defaultHeight = defaultHeight,
+        viewportWidth = viewportWidth,
+        viewportHeight = viewportHeight,
+    )
+    group.forEach { node ->
+        if (node is VectorPath) {
+            builder.addPath(
+                pathData = node.pathData,
+                pathFillType = node.pathFillType,
+                name = node.name,
+                fill = node.fill,
+                fillAlpha = if (node.fill != null) 1f else node.fillAlpha,
+                stroke = node.stroke,
+                strokeAlpha = 1f,
+                strokeLineWidth = node.strokeLineWidth,
+                strokeLineCap = node.strokeLineCap,
+                strokeLineJoin = node.strokeLineJoin,
+                strokeLineMiter = node.strokeLineMiter,
+            )
+        }
+    }
+    return builder.build()
+}
+
+/**
+ * A Flux echo icon with a coloured echo: the icon in [tint] over the same strokes in [echoTint],
+ * offset 0.9dp right and down, like a print slightly out of register. [lively] makes the echo
+ * jump to (1.6, -0.6) dp (hover, selection) and, while music plays, pulse on the beat. Icons
+ * without the echo groups (brand logos) draw as plain tinted vectors.
+ */
+@Composable
+fun FluxIcon(
+    imageVector: ImageVector,
+    contentDescription: String?,
+    tint: Color,
+    modifier: Modifier = Modifier,
+    size: Dp = 24.dp,
+    echoTint: Color = AppTheme.flux.flowB.copy(alpha = 0.7f),
+    lively: Boolean = false,
+    pulse: Boolean = false,
+) {
+    val ink = remember(imageVector) { imageVector.layer(FLUX_ICON_INK) }
+    val echo = remember(imageVector) { imageVector.layer(FLUX_ICON_ECHO) }
+    val inkPainter = rememberVectorPainter(ink ?: imageVector)
+    val echoPainter = echo?.let { rememberVectorPainter(it) }
+    val shift by animateFloatAsState(
+        if (lively) 1f else 0f, spring(dampingRatio = 0.55f, stiffness = 420f), label = "flux-echo",
+    )
+    val time = LocalFluxAmbient.current
+    val energy = LocalFluxEnergy.current
+    Box(
+        modifier
+            .size(size)
+            .then(
+                if (contentDescription != null) Modifier.semantics { this.contentDescription = contentDescription }
+                else Modifier
+            )
+            .drawBehind {
+                val unit = this.size.width / 24f
+                if (echoPainter != null) {
+                    val k = if (pulse) beat(time.value, energy.value) else 0f
+                    val dx = (0.9f + 0.7f * shift + 0.7f * k) * unit
+                    val dy = (0.9f - 1.5f * shift + 0.3f * k) * unit
+                    translate(dx - 0.9f * unit, dy - 0.9f * unit) {
+                        with(echoPainter) { draw(this@drawBehind.size, colorFilter = ColorFilter.tint(echoTint)) }
+                    }
+                }
+                with(inkPainter) { draw(this@drawBehind.size, colorFilter = ColorFilter.tint(tint)) }
+            }
+    )
+}
+
+/** The wordmark's text style: Instrument Serif italic in `text`. */
 @Composable
 fun fluxWordmarkStyle(base: TextStyle = AppTheme.typography.wordmark): TextStyle =
-    base.copy(brush = AppTheme.fluxBrush)
+    base.copy(color = AppTheme.colors.onSurface)
+
+/** The wordmark: [name] in Instrument Serif italic followed by a small `accentBottom` dot. */
+@Composable
+fun FluxWordmark(name: String, modifier: Modifier = Modifier, style: TextStyle = fluxWordmarkStyle()) {
+    val dot = AppTheme.flux.accentBottom
+    val fontSize = style.fontSize
+    Row(modifier, verticalAlignment = Alignment.Bottom) {
+        BasicText(name, style = style)
+        Box(
+            Modifier
+                .padding(start = 2.dp, bottom = (fontSize.value * 0.2f).dp)
+                .size((fontSize.value * 0.2f).coerceIn(4f, 10f).dp)
+                .drawBehind { drawCircle(dot) }
+        )
+    }
+}

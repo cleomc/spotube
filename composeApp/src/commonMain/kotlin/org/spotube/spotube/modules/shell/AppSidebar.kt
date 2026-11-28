@@ -19,7 +19,7 @@ package org.spotube.spotube.modules.shell
 
 import org.spotube.spotube.core.ui.theming.fluxGlass
 import spotube.composeapp.generated.resources.welcome_app_name
-import org.spotube.spotube.core.ui.theming.fluxWordmarkStyle
+import org.spotube.spotube.core.ui.theming.FluxWordmark
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -120,10 +120,7 @@ fun AppSidebar(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 AnimatedVisibility(visible = expanded, enter = fadeIn(), exit = fadeOut()) {
-                    Text(
-                        text = stringResource(Res.string.welcome_app_name).lowercase(),
-                        style = fluxWordmarkStyle()
-                    )
+                    FluxWordmark(stringResource(Res.string.welcome_app_name))
                 }
                 MillenniumSidebarTrigger {
                     MillenniumIconButton(

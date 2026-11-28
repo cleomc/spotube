@@ -19,7 +19,7 @@ package org.spotube.spotube.modules.home
 
 
 import spotube.composeapp.generated.resources.welcome_app_name
-import org.spotube.spotube.core.ui.theming.fluxWordmarkStyle
+import org.spotube.spotube.core.ui.theming.FluxWordmark
 import org.spotube.spotube.core.ui.theming.fluxBackground
 import org.spotube.millennium.composables.MillenniumIcon
 import org.spotube.millennium.composables.MillenniumIconButton
@@ -144,10 +144,7 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
             backButton = false,
             title = {
                 if (isSmallScreen) {
-                    Text(
-                        text = stringResource(Res.string.welcome_app_name).lowercase(),
-                        style = fluxWordmarkStyle()
-                    )
+                    FluxWordmark(stringResource(Res.string.welcome_app_name))
                 } else {
                     Text(stringResource(Res.string.home_title_browse))
                 }

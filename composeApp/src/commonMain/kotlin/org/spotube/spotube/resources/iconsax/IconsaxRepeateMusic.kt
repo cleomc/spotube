@@ -15,78 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// Generated from the Spotube Flux echo icons (geometry from Lucide, ISC licence). Do not edit.
+
 package org.spotube.spotube.resources.iconsax
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.PathData
-import androidx.compose.ui.graphics.vector.group
-import androidx.compose.ui.graphics.vector.path
-import androidx.compose.ui.unit.dp
 
 val Iconsax.IconsaxRepeateMusic: ImageVector
     get() {
-        if (_IconsaxRepeateMusic != null) {
-            return _IconsaxRepeateMusic!!
-        }
-        _IconsaxRepeateMusic = ImageVector.Builder(
+        _IconsaxRepeateMusic?.let { return it }
+        return fluxIcon(
             name = "IconsaxRepeateMusic",
-            defaultWidth = 24.dp,
-            defaultHeight = 24.dp,
-            viewportWidth = 24f,
-            viewportHeight = 24f
-        ).apply {
-            group(
-                clipPathData = PathData {
-                    moveTo(0f, 0f)
-                    horizontalLineToRelative(24f)
-                    verticalLineToRelative(24f)
-                    horizontalLineToRelative(-24f)
-                    close()
-                }
-            ) {
-                path(
-                    stroke = SolidColor(Color.White),
-                    strokeLineWidth = 1.5f,
-                    strokeLineCap = StrokeCap.Round,
-                    strokeLineJoin = StrokeJoin.Round
-                ) {
-                    moveTo(14f, 3f)
-                    lineTo(16.44f, 5.34f)
-                    lineTo(8.49f, 5.32f)
-                    curveTo(4.92f, 5.32f, 1.99f, 8.25f, 1.99f, 11.84f)
-                    curveTo(1.99f, 13.63f, 2.72f, 15.26f, 3.9f, 16.44f)
-                }
-                path(
-                    stroke = SolidColor(Color.White),
-                    strokeLineWidth = 1.5f,
-                    strokeLineCap = StrokeCap.Round,
-                    strokeLineJoin = StrokeJoin.Round
-                ) {
-                    moveTo(10f, 21f)
-                    lineTo(7.56f, 18.66f)
-                    lineTo(15.51f, 18.68f)
-                    curveTo(19.08f, 18.68f, 22.01f, 15.75f, 22.01f, 12.16f)
-                    curveTo(22.01f, 10.37f, 21.28f, 8.74f, 20.1f, 7.56f)
-                }
-                path(
-                    fillAlpha = 0.4f,
-                    stroke = SolidColor(Color.White),
-                    strokeAlpha = 0.4f,
-                    strokeLineWidth = 1.5f,
-                    strokeLineCap = StrokeCap.Round,
-                    strokeLineJoin = StrokeJoin.Round
-                ) {
-                    moveTo(9f, 12f)
-                    horizontalLineTo(15f)
-                }
-            }
-        }.build()
-
-        return _IconsaxRepeateMusic!!
+            strokes = listOf(
+                "m17 2 4 4-4 4",
+                "M3 11v-1a4 4 0 0 1 4-4h14",
+                "m7 22-4-4 4-4",
+                "M21 13v1a4 4 0 0 1-4 4H3",
+            ),
+            fills = emptyList(),
+        ).also { _IconsaxRepeateMusic = it }
     }
 
 @Suppress("ObjectPropertyName")

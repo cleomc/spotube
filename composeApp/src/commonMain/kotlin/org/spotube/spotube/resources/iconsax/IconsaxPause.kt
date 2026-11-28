@@ -15,69 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// Generated from the Spotube Flux echo icons (geometry from Lucide, ISC licence). Do not edit.
+
 package org.spotube.spotube.resources.iconsax
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.PathData
-import androidx.compose.ui.graphics.vector.group
-import androidx.compose.ui.graphics.vector.path
-import androidx.compose.ui.unit.dp
 
 val Iconsax.IconsaxPause: ImageVector
     get() {
-        if (_IconsaxPause != null) {
-            return _IconsaxPause!!
-        }
-        _IconsaxPause = ImageVector.Builder(
+        _IconsaxPause?.let { return it }
+        return fluxIcon(
             name = "IconsaxPause",
-            defaultWidth = 24.dp,
-            defaultHeight = 24.dp,
-            viewportWidth = 24f,
-            viewportHeight = 24f
-        ).apply {
-            group(
-                clipPathData = PathData {
-                    moveTo(0f, 0f)
-                    horizontalLineToRelative(24f)
-                    verticalLineToRelative(24f)
-                    horizontalLineToRelative(-24f)
-                    close()
-                }
-            ) {
-                path(fill = SolidColor(Color.White)) {
-                    moveTo(10.65f, 19.11f)
-                    verticalLineTo(4.89f)
-                    curveTo(10.65f, 3.54f, 10.08f, 3f, 8.64f, 3f)
-                    horizontalLineTo(5.01f)
-                    curveTo(3.57f, 3f, 3f, 3.54f, 3f, 4.89f)
-                    verticalLineTo(19.11f)
-                    curveTo(3f, 20.46f, 3.57f, 21f, 5.01f, 21f)
-                    horizontalLineTo(8.64f)
-                    curveTo(10.08f, 21f, 10.65f, 20.46f, 10.65f, 19.11f)
-                    close()
-                }
-                path(
-                    fill = SolidColor(Color.White),
-                    fillAlpha = 0.4f,
-                    strokeAlpha = 0.4f
-                ) {
-                    moveTo(21f, 19.11f)
-                    verticalLineTo(4.89f)
-                    curveTo(21f, 3.54f, 20.43f, 3f, 18.99f, 3f)
-                    horizontalLineTo(15.36f)
-                    curveTo(13.93f, 3f, 13.35f, 3.54f, 13.35f, 4.89f)
-                    verticalLineTo(19.11f)
-                    curveTo(13.35f, 20.46f, 13.92f, 21f, 15.36f, 21f)
-                    horizontalLineTo(18.99f)
-                    curveTo(20.43f, 21f, 21f, 20.46f, 21f, 19.11f)
-                    close()
-                }
-            }
-        }.build()
-
-        return _IconsaxPause!!
+            strokes = listOf(
+                "M15 3h3a1 1 0 0 1 1 1v16a1 1 0 0 1 -1 1h-3a1 1 0 0 1 -1 -1v-16a1 1 0 0 1 1 -1z",
+                "M6 3h3a1 1 0 0 1 1 1v16a1 1 0 0 1 -1 1h-3a1 1 0 0 1 -1 -1v-16a1 1 0 0 1 1 -1z",
+            ),
+            fills = emptyList(),
+        ).also { _IconsaxPause = it }
     }
 
 @Suppress("ObjectPropertyName")

@@ -56,11 +56,12 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.composeunstyled.Text
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
-import org.spotube.millennium.composables.MillenniumIcon
+import org.spotube.spotube.core.ui.theming.FluxIcon
 import org.spotube.spotube.NavigationItem
 import org.spotube.spotube.bottombarTabs
 import org.spotube.spotube.core.navigation.NavigationState
@@ -71,13 +72,13 @@ import org.spotube.spotube.core.ui.theming.fluxGlass
 import org.spotube.spotube.core.ui.theming.fluxPress
 import org.spotube.spotube.modules.downloads.DownloadBadgeIndicator
 
-private val BarHeight = 68.dp
+private val BarHeight = 64.dp
 private val BarPadding = 6.dp
 
 /**
- * Floating fluted-glass capsule with a liquid flux bubble: the bubble's leading edge springs to
- * the new tab first and its trailing edge follows, so it stretches while it travels and settles
- * back into a pill with a little wobble.
+ * Floating fluted-glass pill. The selection is a soft `text` 9 % capsule with a 4dp `accentTop`
+ * dot at its foot; its leading edge springs to the new tab first and its trailing edge follows,
+ * so it stretches while it travels and settles back with a little wobble.
  */
 @Composable
 fun AppBottombar(
@@ -89,7 +90,7 @@ fun AppBottombar(
     val tabs = remember { bottombarTabs.filterIsInstance<NavigationItem.Tab<*>>() }
     val selectedIndex = tabs.indexOfFirst { it.route == navigationState.topLevelRoute }
     val flux = AppTheme.flux
-    val fluxBrush = AppTheme.fluxBrush
+    val capsule = AppTheme.colors.onSurface.copy(alpha = 0.09f)
 
     Box(
         modifier = modifier
@@ -97,7 +98,7 @@ fun AppBottombar(
             .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
             .fillMaxWidth()
             .height(BarHeight)
-            .fluxGlass(CircleShape, neon = 0.55f)
+            .fluxGlass(CircleShape)
             .padding(BarPadding)
     ) {
         BoxWithConstraints(Modifier.fillMaxSize()) {
@@ -131,23 +132,16 @@ fun AppBottombar(
                     val top = squash / 2f
                     val h = size.height - squash
                     val r = CornerRadius(h / 2f, h / 2f)
-                    // Bloom, then the flux fill, then a glossy top highlight.
                     drawRoundRect(
-                        color = flux.accentTop, topLeft = Offset(left - 4f, top + 6f),
-                        size = Size(right - left + 8f, h), cornerRadius = r, alpha = 0.35f * bubbleAlpha,
-                    )
-                    drawRoundRect(
-                        brush = fluxBrush, topLeft = Offset(left, top),
+                        color = capsule, topLeft = Offset(left, top),
                         size = Size(right - left, h), cornerRadius = r, alpha = bubbleAlpha,
                     )
-                    drawRoundRect(
-                        brush = androidx.compose.ui.graphics.Brush.verticalGradient(
-                            0f to androidx.compose.ui.graphics.Color.White.copy(alpha = 0.32f),
-                            0.5f to androidx.compose.ui.graphics.Color.Transparent,
-                            startY = top, endY = top + h,
-                        ),
-                        topLeft = Offset(left, top), size = Size(right - left, h),
-                        cornerRadius = r, alpha = bubbleAlpha,
+                    // The accent dot at the capsule's foot, riding its centre.
+                    val dot = 2.dp.toPx()
+                    drawCircle(
+                        color = flux.accentTop, radius = dot,
+                        center = Offset((left + right) / 2f, top + h - 5.dp.toPx() - dot),
+                        alpha = bubbleAlpha,
                     )
                 }
             )
@@ -178,11 +172,11 @@ private fun BottomTab(
     val colors = AppTheme.colors
     val title = stringResource(tab.title)
     val tint by animateColorAsState(
-        if (selected) colors.onPrimary else colors.onSurfaceVariant, tween(160), label = "tab-tint"
+        if (selected) colors.onSurface else colors.onSurfaceVariant, tween(160), label = "tab-tint"
     )
     val lift by animateFloatAsState(
         if (selected) 1f else 0f,
-        spring(dampingRatio = 0.5f, stiffness = 380f),
+        spring(dampingRatio = 0.55f, stiffness = 420f),
         label = "tab-lift",
     )
     Column(
@@ -199,18 +193,15 @@ private fun BottomTab(
         verticalArrangement = Arrangement.Center,
     ) {
         Box {
-            MillenniumIcon(
+            FluxIcon(
                 imageVector = tab.icon,
                 contentDescription = null,
                 tint = tint,
-                modifier = Modifier
-                    .size(22.dp)
-                    .graphicsLayer {
-                        val s = 1f + 0.1f * lift
-                        scaleX = s; scaleY = s
-                        translationY = -2.dp.toPx() * lift
-                        rotationZ = -8f * lift * (1f - lift) * 4f
-                    }
+                size = 20.dp,
+                lively = selected,
+                modifier = Modifier.graphicsLayer {
+                    translationY = -3.dp.toPx() * lift
+                },
             )
             if (badge != null) {
                 Box(Modifier.align(Alignment.TopEnd).offset(x = 6.dp, y = (-4).dp)) { badge() }
@@ -218,11 +209,11 @@ private fun BottomTab(
         }
         Text(
             text = title,
-            style = AppTheme.typography.labelSmall,
+            style = AppTheme.typography.labelMedium.copy(fontSize = 10.sp, lineHeight = 12.sp),
             color = tint,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(top = 2.dp, start = 2.dp, end = 2.dp),
+            modifier = Modifier.padding(top = 3.dp, bottom = 6.dp, start = 2.dp, end = 2.dp),
         )
     }
 }

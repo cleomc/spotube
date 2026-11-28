@@ -1,60 +1,38 @@
+/*
+ * Copyright (C) 2026 Kingkor Roy Tirtho and Spotube Contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// Generated from the Spotube Flux echo icons (geometry from Lucide, ISC licence). Do not edit.
+
 package org.spotube.spotube.resources.iconsax
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.path
-import androidx.compose.ui.unit.dp
 
 val Iconsax.IconsaxImportArrow2Bulk: ImageVector
     get() {
-        if (_IconsaxImportArrow2Bulk != null) {
-            return _IconsaxImportArrow2Bulk!!
-        }
-        _IconsaxImportArrow2Bulk = ImageVector.Builder(
+        _IconsaxImportArrow2Bulk?.let { return it }
+        return fluxIcon(
             name = "IconsaxImportArrow2Bulk",
-            defaultWidth = 24.dp,
-            defaultHeight = 24.dp,
-            viewportWidth = 24f,
-            viewportHeight = 24f
-        ).apply {
-            path(
-                fill = SolidColor(Color.White),
-                fillAlpha = 0.4f,
-                strokeAlpha = 0.4f
-            ) {
-                moveTo(16.8f, 9f)
-                horizontalLineTo(7.2f)
-                curveTo(4f, 9f, 2f, 11f, 2f, 14.2f)
-                verticalLineTo(16.79f)
-                curveTo(2f, 20f, 4f, 22f, 7.2f, 22f)
-                horizontalLineTo(16.79f)
-                curveTo(19.99f, 22f, 21.99f, 20f, 21.99f, 16.8f)
-                verticalLineTo(14.2f)
-                curveTo(22f, 11f, 20f, 9f, 16.8f, 9f)
-                close()
-            }
-            path(fill = SolidColor(Color.White)) {
-                moveTo(15.88f, 12.43f)
-                lineTo(12.53f, 15.78f)
-                curveTo(12.24f, 16.07f, 11.76f, 16.07f, 11.47f, 15.78f)
-                lineTo(8.12f, 12.43f)
-                curveTo(7.83f, 12.14f, 7.83f, 11.66f, 8.12f, 11.37f)
-                curveTo(8.41f, 11.08f, 8.89f, 11.08f, 9.18f, 11.37f)
-                lineTo(11.25f, 13.44f)
-                verticalLineTo(2.75f)
-                curveTo(11.25f, 2.34f, 11.59f, 2f, 12f, 2f)
-                curveTo(12.41f, 2f, 12.75f, 2.34f, 12.75f, 2.75f)
-                verticalLineTo(13.44f)
-                lineTo(14.82f, 11.37f)
-                curveTo(14.97f, 11.22f, 15.16f, 11.15f, 15.35f, 11.15f)
-                curveTo(15.54f, 11.15f, 15.73f, 11.22f, 15.88f, 11.37f)
-                curveTo(16.18f, 11.66f, 16.18f, 12.13f, 15.88f, 12.43f)
-                close()
-            }
-        }.build()
-
-        return _IconsaxImportArrow2Bulk!!
+            strokes = listOf(
+                "M12 15V3",
+                "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4",
+                "m7 10 5 5 5-5",
+            ),
+            fills = emptyList(),
+        ).also { _IconsaxImportArrow2Bulk = it }
     }
 
 @Suppress("ObjectPropertyName")

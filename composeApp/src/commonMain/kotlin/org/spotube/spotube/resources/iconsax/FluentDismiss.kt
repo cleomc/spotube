@@ -1,50 +1,37 @@
+/*
+ * Copyright (C) 2026 Kingkor Roy Tirtho and Spotube Contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// Generated from the Spotube Flux echo icons (geometry from Lucide, ISC licence). Do not edit.
+
 package org.spotube.spotube.resources.iconsax
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.path
-import androidx.compose.ui.unit.dp
 
 val Iconsax.FluentDismiss: ImageVector
     get() {
-        if (_FluentDismiss != null) {
-            return _FluentDismiss!!
-        }
-        _FluentDismiss = ImageVector.Builder(
+        _FluentDismiss?.let { return it }
+        return fluxIcon(
             name = "FluentDismiss",
-            defaultWidth = 24.dp,
-            defaultHeight = 24.dp,
-            viewportWidth = 24f,
-            viewportHeight = 24f
-        ).apply {
-            path(fill = SolidColor(Color(0xFF212121))) {
-                moveToRelative(4.397f, 4.554f)
-                lineToRelative(0.073f, -0.084f)
-                arcToRelative(0.75f, 0.75f, 0f, isMoreThanHalf = false, isPositiveArc = true, 0.976f, -0.073f)
-                lineToRelative(0.084f, 0.073f)
-                lineTo(12f, 10.939f)
-                lineToRelative(6.47f, -6.47f)
-                arcToRelative(0.75f, 0.75f, 0f, isMoreThanHalf = true, isPositiveArc = true, 1.06f, 1.061f)
-                lineTo(13.061f, 12f)
-                lineToRelative(6.47f, 6.47f)
-                arcToRelative(0.75f, 0.75f, 0f, isMoreThanHalf = false, isPositiveArc = true, 0.072f, 0.976f)
-                lineToRelative(-0.073f, 0.084f)
-                arcToRelative(0.75f, 0.75f, 0f, isMoreThanHalf = false, isPositiveArc = true, -0.976f, 0.073f)
-                lineToRelative(-0.084f, -0.073f)
-                lineTo(12f, 13.061f)
-                lineToRelative(-6.47f, 6.47f)
-                arcToRelative(0.75f, 0.75f, 0f, isMoreThanHalf = false, isPositiveArc = true, -1.06f, -1.061f)
-                lineTo(10.939f, 12f)
-                lineToRelative(-6.47f, -6.47f)
-                arcToRelative(0.75f, 0.75f, 0f, isMoreThanHalf = false, isPositiveArc = true, -0.072f, -0.976f)
-                lineToRelative(0.073f, -0.084f)
-                lineToRelative(-0.073f, 0.084f)
-                close()
-            }
-        }.build()
-
-        return _FluentDismiss!!
+            strokes = listOf(
+                "M18 6 6 18",
+                "m6 6 12 12",
+            ),
+            fills = emptyList(),
+        ).also { _FluentDismiss = it }
     }
 
 @Suppress("ObjectPropertyName")

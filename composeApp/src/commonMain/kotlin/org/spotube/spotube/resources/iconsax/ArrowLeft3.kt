@@ -15,51 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// Generated from the Spotube Flux echo icons (geometry from Lucide, ISC licence). Do not edit.
+
 package org.spotube.spotube.resources.iconsax
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.path
-import androidx.compose.ui.unit.dp
 
 val Iconsax.ArrowLeft3: ImageVector
     get() {
-        if (_ArrowLeft3 != null) {
-            return _ArrowLeft3!!
-        }
-        _ArrowLeft3 = ImageVector.Builder(
+        _ArrowLeft3?.let { return it }
+        return fluxIcon(
             name = "ArrowLeft3",
-            defaultWidth = 24.dp,
-            defaultHeight = 24.dp,
-            viewportWidth = 24f,
-            viewportHeight = 24f
-        ).apply {
-            path(
-                stroke = SolidColor(Color.White),
-                strokeLineWidth = 1.5f,
-                strokeLineCap = StrokeCap.Round,
-                strokeLineJoin = StrokeJoin.Round
-            ) {
-                moveTo(11.19f, 7.94f)
-                lineTo(8.57f, 10.56f)
-                curveTo(7.8f, 11.33f, 7.8f, 12.59f, 8.57f, 13.36f)
-                lineTo(15.09f, 19.88f)
-            }
-            path(
-                stroke = SolidColor(Color.White),
-                strokeLineWidth = 1.5f,
-                strokeLineCap = StrokeCap.Round,
-                strokeLineJoin = StrokeJoin.Round
-            ) {
-                moveTo(15.09f, 4.04f)
-                lineTo(14.05f, 5.08f)
-            }
-        }.build()
-
-        return _ArrowLeft3!!
+            strokes = listOf(
+                "m12 19-7-7 7-7",
+                "M19 12H5",
+            ),
+            fills = emptyList(),
+        ).also { _ArrowLeft3 = it }
     }
 
 @Suppress("ObjectPropertyName")

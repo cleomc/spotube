@@ -1,64 +1,37 @@
+/*
+ * Copyright (C) 2026 Kingkor Roy Tirtho and Spotube Contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// Generated from the Spotube Flux echo icons (geometry from Lucide, ISC licence). Do not edit.
+
 package org.spotube.spotube.resources.iconsax
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.PathData
-import androidx.compose.ui.graphics.vector.group
-import androidx.compose.ui.graphics.vector.path
-import androidx.compose.ui.unit.dp
 
 val Iconsax.IconsaxLink: ImageVector
     get() {
-        if (_IconsaxLink != null) {
-            return _IconsaxLink!!
-        }
-        _IconsaxLink = ImageVector.Builder(
+        _IconsaxLink?.let { return it }
+        return fluxIcon(
             name = "IconsaxLink",
-            defaultWidth = 24.dp,
-            defaultHeight = 24.dp,
-            viewportWidth = 24f,
-            viewportHeight = 24f
-        ).apply {
-            group(
-                clipPathData = PathData {
-                    moveTo(0f, 0f)
-                    horizontalLineToRelative(24f)
-                    verticalLineToRelative(24f)
-                    horizontalLineToRelative(-24f)
-                    close()
-                }
-            ) {
-                path(
-                    stroke = SolidColor(Color.White),
-                    strokeLineWidth = 1.5f,
-                    strokeLineCap = StrokeCap.Round,
-                    strokeLineJoin = StrokeJoin.Round
-                ) {
-                    moveTo(13.06f, 10.94f)
-                    curveTo(15.31f, 13.19f, 15.31f, 16.83f, 13.06f, 19.07f)
-                    curveTo(10.81f, 21.31f, 7.17f, 21.32f, 4.93f, 19.07f)
-                    curveTo(2.69f, 16.82f, 2.68f, 13.18f, 4.93f, 10.94f)
-                }
-                path(
-                    fillAlpha = 0.4f,
-                    stroke = SolidColor(Color.White),
-                    strokeAlpha = 0.4f,
-                    strokeLineWidth = 1.5f,
-                    strokeLineCap = StrokeCap.Round,
-                    strokeLineJoin = StrokeJoin.Round
-                ) {
-                    moveTo(10.59f, 13.41f)
-                    curveTo(8.25f, 11.07f, 8.25f, 7.27f, 10.59f, 4.92f)
-                    curveTo(12.93f, 2.57f, 16.73f, 2.58f, 19.08f, 4.92f)
-                    curveTo(21.43f, 7.26f, 21.42f, 11.06f, 19.08f, 13.41f)
-                }
-            }
-        }.build()
-
-        return _IconsaxLink!!
+            strokes = listOf(
+                "M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71",
+                "M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71",
+            ),
+            fills = emptyList(),
+        ).also { _IconsaxLink = it }
     }
 
 @Suppress("ObjectPropertyName")

@@ -32,6 +32,8 @@ import org.spotube.spotube.core.ui.theming.FluxPlayPauseIcon
 import org.spotube.spotube.core.ui.theming.fluxGlass
 import org.spotube.spotube.core.ui.theming.fluxHalo
 import org.spotube.spotube.core.ui.theming.fluxPress
+import org.spotube.spotube.core.ui.theming.fluxProgressRing
+import androidx.compose.ui.graphics.Brush
 import org.spotube.millennium.composables.MillenniumIcon
 import org.spotube.millennium.composables.MillenniumIconButton
 import org.spotube.millennium.composables.MillenniumIconButtonStyle
@@ -147,13 +149,12 @@ internal fun FloatingPlayerContent(
 ) {
     val coverModel = playerUiState.coverModel
     val flux = AppTheme.flux
-    val fluxBrush = AppTheme.fluxBrush
-    val capsule = RoundedCornerShape(24.dp)
-    val neon by animateFloatAsState(if (playerUiState.isPlaying) 0.9f else 0.35f, tween(600))
+    val capsule = RoundedCornerShape(22.dp)
+    val hair = AppTheme.colors.outline.copy(alpha = 0.5f)
     val progress by animateFloatAsState(playerUiState.progress, tween(300))
 
-    // Flux: a floating glass capsule above the bottom bar, glowing while music plays, with the
-    // progress drawn as a neon line along its bottom edge.
+    // Flux: a floating glass panel above the bottom bar, with the progress as a 1.5dp accent line
+    // along its bottom edge and a progress ring around the ink play disc.
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -163,24 +164,25 @@ internal fun FloatingPlayerContent(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .fluxGlass(capsule, neon = neon)
+                .fluxGlass(capsule)
                 .drawWithContent {
                     drawContent()
-                    val y = size.height - 2.dp.toPx()
-                    val inset = 22.dp.toPx()
+                    val y = size.height - 3.dp.toPx()
+                    val inset = 18.dp.toPx()
                     val w = size.width - 2 * inset
                     drawLine(
-                        color = flux.rib, start = Offset(inset, y), end = Offset(inset + w, y),
-                        strokeWidth = 2.dp.toPx(), cap = StrokeCap.Round
+                        color = hair, start = Offset(inset, y), end = Offset(inset + w, y),
+                        strokeWidth = 1.dp.toPx(), cap = StrokeCap.Round
                     )
                     if (progress > 0f) {
                         val end = Offset(inset + w * progress.coerceIn(0f, 1f), y)
                         drawLine(
-                            brush = fluxBrush, start = Offset(inset, y), end = end,
-                            strokeWidth = 2.5.dp.toPx(), cap = StrokeCap.Round
+                            brush = Brush.horizontalGradient(
+                                listOf(flux.accentTop, flux.accentBottom), startX = inset, endX = inset + w,
+                            ),
+                            start = Offset(inset, y), end = end,
+                            strokeWidth = 1.5.dp.toPx(), cap = StrokeCap.Round
                         )
-                        drawCircle(flux.accentTop, radius = 7.dp.toPx(), center = end, alpha = 0.35f)
-                        drawCircle(Color.White, radius = 2.5.dp.toPx(), center = end)
                     }
                 }
         ) {
@@ -195,14 +197,14 @@ internal fun FloatingPlayerContent(
                     modifier = Modifier.weight(1f),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val artShape = RoundedCornerShape(14.dp)
+                    val artShape = RoundedCornerShape(10.dp)
                     Box(
                         modifier = Modifier
                             .size(46.dp)
                             .fluxHalo(playerUiState.isPlaying, artShape)
                             .then(albumArtModifier)
                             .clip(artShape)
-                            .background(AppTheme.colors.onSurface.copy(alpha = 0.12f)),
+                            .background(AppTheme.colors.surfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
                         if (coverModel != null) AsyncImage(
@@ -245,12 +247,14 @@ internal fun FloatingPlayerContent(
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     heartButton()
-                    Spacer(modifier = Modifier.size(8.dp))
+                    Spacer(modifier = Modifier.size(12.dp))
                     MillenniumIconButton(
                         onClick = onPlayPause,
                         enabled = playerUiState.queue.isNotEmpty(),
                         style = MillenniumIconButtonStyle.Primary,
-                        modifier = Modifier.fluxPress(0.88f)
+                        modifier = Modifier
+                            .fluxPress(0.94f)
+                            .fluxProgressRing(playerUiState.progress, inset = 4.dp)
                     ) {
                         FluxPlayPauseIcon(
                             playing = playerUiState.isPlaying,

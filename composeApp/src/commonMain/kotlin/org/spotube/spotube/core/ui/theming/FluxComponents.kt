@@ -72,16 +72,17 @@ import org.spotube.millennium.theme.defaultMillenniumThemeComponents
 
 /*
  * Millennium component themes restyled for Spotube Flux: no gels, bevels, orbs or inner glows;
- * pills for every button, 12/18/28dp corners elsewhere, and the flux gradient as the only loud
- * fill (primary actions, selection, checked state, played progress).
+ * pills for buttons, 10/14/22dp corners elsewhere. Primary actions are ink (a text fill with a
+ * background label); the accent only appears as thin light (checked controls, played lines,
+ * focus borders, selection ticks).
  */
 
 private val Clear = Color.Transparent
 private val ClearBrush: Brush = SolidColor(Color.Transparent)
 private val Pill = CircleShape
-private val Small = RoundedCornerShape(12.dp)
-private val Medium = RoundedCornerShape(18.dp)
-private val Large = RoundedCornerShape(28.dp)
+private val Small = RoundedCornerShape(10.dp)
+private val Medium = RoundedCornerShape(14.dp)
+private val Large = RoundedCornerShape(22.dp)
 
 /** Maps every state of a control property, telling the mapper which state it is. */
 private inline fun <T> MillenniumControlStateProperty<T>.mapStates(
@@ -105,8 +106,10 @@ fun fluxThemeComponents(
     type: AppTypography,
 ): MillenniumThemeComponents {
     val flux = fluxBrush(colors)
-    val glow = listOf(colors.accentTop.copy(alpha = 0.55f), colors.accentBottom.copy(alpha = 0.45f))
-    val raisedFill: Brush = SolidColor(colors.raised.copy(alpha = 0.70f))
+    val ink: Brush = SolidColor(colors.text)
+    val accentFill: Brush = SolidColor(colors.accentTop)
+    val hair = colors.border.copy(alpha = 0.6f)
+    val wash = { alpha: Float -> SolidColor(colors.text.copy(alpha = alpha)) }
     val insetFill: Brush = SolidColor(colors.inset)
     val label = type.labelLarge
     val base = defaultMillenniumThemeComponents()
@@ -127,64 +130,73 @@ fun fluxThemeComponents(
 
     val buttons = defaultMillenniumButtonTheme().let { t ->
         fun MillenniumControlStateProperty<org.spotube.millennium.composables.MillenniumButtonThemeProperties>.restyle(
-            background: Brush?,
-            border: Color?,
-            shadows: List<Color>?,
-            elevation: Boolean,
+            background: (MillenniumControlState) -> Brush?,
+            border: (MillenniumControlState) -> Color?,
+            foreground: Color,
         ) = mapStates { state, p ->
             p.copy(
-                background = background,
+                background = background(state),
+                foreground = foreground,
                 textStyle = label,
                 shape = Pill,
-                padding = PaddingValues(horizontal = 22.dp, vertical = 10.dp),
+                padding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
                 contentSpacing = 8.dp,
-                borderColor = if (state == MillenniumControlState.Focused) colors.accent else border,
-                shadows = shadows,
-                shadowElevation = if (!elevation || state == MillenniumControlState.Disabled ||
-                    state == MillenniumControlState.Pressed
-                ) 0.dp else if (state == MillenniumControlState.Hovered) 14.dp else 10.dp,
+                borderColor = if (state == MillenniumControlState.Focused) colors.accent else border(state),
+                shadows = null,
+                shadowElevation = 0.dp,
                 innerGlowColor = Clear,
                 bottomRimColor = Clear,
-                alpha = if (state == MillenniumControlState.Disabled) 0.4f else 1f,
-                motion = p.motion.copy(hoverScale = 1.02f, pressedScale = 0.95f),
+                alpha = if (state == MillenniumControlState.Disabled) 0.38f else 1f,
+                motion = p.motion.copy(hoverScale = 1f, pressedScale = 0.97f),
             )
         }
+        val hoverish = setOf(MillenniumControlState.Hovered, MillenniumControlState.Pressed)
         MillenniumButtonTheme(
-            primary = t.primary.restyle(flux, Clear, glow, elevation = true),
-            secondary = t.secondary.restyle(raisedFill, colors.border, null, elevation = false),
-            quiet = t.quiet.restyle(null, null, null, elevation = false),
-            danger = t.danger.restyle(SolidColor(colors.danger), Clear, null, elevation = false)
-                .mapStates { _, p -> p.copy(foreground = colors.background) },
+            primary = t.primary.restyle({ ink }, { Clear }, colors.background),
+            secondary = t.secondary.restyle(
+                { if (it in hoverish) wash(0.04f) else null },
+                { if (it in hoverish) colors.text else colors.border },
+                colors.text,
+            ),
+            quiet = t.quiet.restyle({ if (it in hoverish) wash(0.06f) else null }, { null }, colors.text),
+            danger = t.danger.restyle(
+                { if (it in hoverish) SolidColor(colors.danger.copy(alpha = 0.08f)) else null },
+                { colors.danger.copy(alpha = 0.6f) },
+                colors.danger,
+            ),
         )
     }
 
     val iconButtons = defaultMillenniumIconButtonTheme().let { t ->
         fun MillenniumControlStateProperty<org.spotube.millennium.composables.MillenniumIconButtonThemeProperties>.restyle(
-            background: Brush?,
+            background: (MillenniumControlState) -> Brush?,
             border: Color?,
-            shadows: List<Color>?,
+            foreground: Color?,
         ) = mapStates { state, p ->
             p.copy(
-                background = background,
+                background = background(state),
+                foreground = foreground ?: p.foreground,
                 shape = Pill,
                 borderColor = if (state == MillenniumControlState.Focused) colors.accent else border,
-                shadows = shadows,
-                shadowElevation = if (shadows != null && state != MillenniumControlState.Pressed &&
-                    state != MillenniumControlState.Disabled
-                ) 10.dp else 0.dp,
+                shadows = null,
+                shadowElevation = 0.dp,
                 innerGlowColor = Clear,
                 bottomRimColor = Clear,
                 orb = false,
-                alpha = if (state == MillenniumControlState.Disabled) 0.4f else 1f,
-                motion = p.motion.copy(hoverScale = 1.08f, pressedScale = 0.90f),
+                alpha = if (state == MillenniumControlState.Disabled) 0.38f else 1f,
+                motion = p.motion.copy(hoverScale = 1.04f, pressedScale = 0.92f),
             )
         }
+        val hoverish = setOf(MillenniumControlState.Hovered, MillenniumControlState.Pressed)
         MillenniumIconButtonTheme(
-            primary = t.primary.restyle(flux, Clear, glow),
-            secondary = t.secondary.restyle(raisedFill, colors.border, null),
-            quiet = t.quiet.restyle(null, null, null),
-            danger = t.danger.restyle(SolidColor(colors.danger), Clear, null)
-                .mapStates { _, p -> p.copy(foreground = colors.background) },
+            primary = t.primary.restyle({ ink }, Clear, colors.background),
+            secondary = t.secondary.restyle({ if (it in hoverish) wash(0.06f) else null }, colors.border, null),
+            quiet = t.quiet.restyle({ if (it in hoverish) wash(0.07f) else null }, null, null),
+            danger = t.danger.restyle(
+                { if (it in hoverish) SolidColor(colors.danger.copy(alpha = 0.08f)) else null },
+                colors.danger.copy(alpha = 0.6f),
+                colors.danger,
+            ),
         )
     }
 
@@ -192,7 +204,7 @@ fun fluxThemeComponents(
         MillenniumToggleSwitchTheme(states = t.states.mapStates { _, p ->
             p.copy(
                 trackBackground = insetFill,
-                selectedTrackBackground = flux,
+                selectedTrackBackground = accentFill,
                 trackShape = Pill,
                 trackGlowColor = Clear,
                 thumbBackground = SolidColor(Color.White),
@@ -208,9 +220,9 @@ fun fluxThemeComponents(
         MillenniumCheckboxTheme(states = t.states.mapStates { _, p ->
             p.copy(
                 faceBackground = insetFill,
-                selectedFaceBackground = flux,
+                selectedFaceBackground = accentFill,
                 selectedFaceForeground = colors.onAccent,
-                faceShape = RoundedCornerShape(8.dp),
+                faceShape = RoundedCornerShape(6.dp),
                 faceGlowColor = Clear,
                 labelStyle = type.bodyMedium,
             )
@@ -220,9 +232,9 @@ fun fluxThemeComponents(
         MillenniumTriStateCheckboxTheme(states = t.states.mapStates { _, p ->
             p.copy(
                 faceBackground = insetFill,
-                selectedFaceBackground = flux,
+                selectedFaceBackground = accentFill,
                 selectedFaceForeground = colors.onAccent,
-                faceShape = RoundedCornerShape(8.dp),
+                faceShape = RoundedCornerShape(6.dp),
                 faceGlowColor = Clear,
                 labelStyle = type.bodyMedium,
             )
@@ -232,14 +244,14 @@ fun fluxThemeComponents(
     val slider = defaultMillenniumSliderTheme().let { t ->
         MillenniumSliderTheme(states = t.states.mapStates { _, p ->
             p.copy(
-                trackBackground = insetFill,
+                trackBackground = SolidColor(colors.border.copy(alpha = 0.7f)),
                 activeTrackBackground = flux,
-                thumbBackground = SolidColor(Color.White),
+                thumbBackground = ink,
                 trackShape = Pill,
                 thumbShape = Pill,
                 trackBorderColor = Clear,
                 thumbBorderColor = Clear,
-                thumbGlowColor = colors.accentTop.copy(alpha = 0.6f),
+                thumbGlowColor = Clear,
                 thumbBottomRimColor = Clear,
                 trackInsetShadeColor = Clear,
             )
@@ -262,11 +274,11 @@ fun fluxThemeComponents(
         MillenniumTabGroupTheme(states = t.states.mapStates { _, p ->
             p.copy(
                 listBackground = insetFill,
-                listShape = Medium,
-                listBorderColor = Clear,
-                tabShape = Small,
-                selectedTabBackground = flux,
-                selectedTabForeground = colors.onAccent,
+                listShape = Pill,
+                listBorderColor = hair,
+                tabShape = Pill,
+                selectedTabBackground = wash(0.09f),
+                selectedTabForeground = colors.text,
                 unselectedTabForeground = colors.muted,
                 tabTextStyle = type.labelLarge,
                 tabGlowColor = Clear,
@@ -278,8 +290,8 @@ fun fluxThemeComponents(
     val segmented = defaultMillenniumSegmentedButtonTheme().let { t ->
         MillenniumSegmentedButtonTheme(states = t.states.mapStates { state, p ->
             p.copy(
-                background = if (state == MillenniumControlState.Selected) flux else null,
-                foreground = if (state == MillenniumControlState.Selected) colors.onAccent else null,
+                background = if (state == MillenniumControlState.Selected) ink else null,
+                foreground = if (state == MillenniumControlState.Selected) colors.background else null,
                 textStyle = type.labelLarge,
                 innerGlowColor = Clear,
             )
@@ -289,12 +301,12 @@ fun fluxThemeComponents(
     val textField = defaultMillenniumTextFieldTheme().let { t ->
         MillenniumTextFieldTheme(states = t.states.mapStates { state, p ->
             p.copy(
-                background = Brush.verticalGradient(
-                    listOf(colors.inset.copy(alpha = 0.72f), colors.inset.copy(alpha = 0.48f))
+                background = SolidColor(
+                    if (state == MillenniumControlState.Focused) colors.raised else colors.inset.copy(alpha = 0.7f)
                 ),
                 shape = Small,
                 textStyle = type.bodyMedium,
-                labelStyle = type.labelMedium,
+                labelStyle = type.labelSmall,
                 placeholderStyle = type.bodyMedium,
                 errorStyle = type.bodySmall,
                 placeholderColor = colors.muted,
@@ -302,7 +314,8 @@ fun fluxThemeComponents(
                 borderColor = when (state) {
                     MillenniumControlState.Focused -> colors.accent
                     MillenniumControlState.Error -> colors.danger
-                    else -> colors.accent.copy(alpha = 0.22f)
+                    MillenniumControlState.Hovered -> colors.text.copy(alpha = 0.6f)
+                    else -> colors.border
                 },
                 insetShadeColor = Clear,
                 innerGlowColor = Clear,
@@ -314,11 +327,9 @@ fun fluxThemeComponents(
     val card = defaultMillenniumCardTheme().let { t ->
         MillenniumCardTheme(states = t.states.mapStates { _, p ->
             p.copy(
-                background = Brush.verticalGradient(
-                    listOf(colors.raised.copy(alpha = 0.58f), colors.surface.copy(alpha = 0.40f))
-                ),
+                background = SolidColor(colors.surface.copy(alpha = 0.55f)),
                 shape = Medium,
-                borderColor = colors.text.copy(alpha = 0.10f),
+                borderColor = colors.border.copy(alpha = 0.45f),
                 innerGlowColor = Clear,
                 bottomRimColor = Clear,
                 contentTextStyle = type.bodyMedium,
@@ -334,12 +345,10 @@ fun fluxThemeComponents(
                 subtitleForeground = colors.muted,
                 background = when (state) {
                     MillenniumControlState.Hovered, MillenniumControlState.Focused,
-                    MillenniumControlState.Pressed -> SolidColor(colors.raised.copy(alpha = 0.55f))
+                    MillenniumControlState.Pressed -> wash(0.04f)
                     else -> null
                 },
-                selectedBackground = Brush.horizontalGradient(
-                    listOf(colors.accentTop.copy(alpha = 0.30f), colors.accentTop.copy(alpha = 0.06f), Clear)
-                ),
+                selectedBackground = wash(0.05f),
                 selectedTitleForeground = colors.accent,
                 selectedSubtitleForeground = colors.muted,
                 shape = Small,
@@ -351,7 +360,7 @@ fun fluxThemeComponents(
 
     val separator = defaultMillenniumSeparatorTheme().let { t ->
         MillenniumSeparatorTheme(states = t.states.mapStates { _, p ->
-            p.copy(color = colors.text.copy(alpha = 0.07f), highlightColor = Clear)
+            p.copy(color = colors.border.copy(alpha = 0.5f), highlightColor = Clear)
         })
     }
 
@@ -362,7 +371,7 @@ fun fluxThemeComponents(
                 shape = Large,
                 titleStyle = type.titleLarge,
                 descriptionStyle = type.bodyMedium,
-                panelBorderColor = colors.border.copy(alpha = 0.55f),
+                panelBorderColor = hair,
                 panelGlowColor = Clear,
                 titleBarBackground = ClearBrush,
                 titleBarBorderColor = Clear,
@@ -377,7 +386,7 @@ fun fluxThemeComponents(
             p.copy(
                 panelBackground = SolidColor(colors.surface),
                 panelShape = Medium,
-                panelBorderColor = colors.border.copy(alpha = 0.55f),
+                panelBorderColor = hair,
                 panelGlowColor = Clear,
                 itemShape = Small,
                 itemTextStyle = type.bodyMedium,
@@ -391,11 +400,11 @@ fun fluxThemeComponents(
         MillenniumModalBottomSheetTheme(states = t.states.mapStates { _, p ->
             p.copy(
                 background = SolidColor(colors.surface),
-                shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+                shape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
                 contentPadding = padding,
                 contentSpacing = 8.dp,
                 handleColor = colors.border,
-                borderColor = colors.border.copy(alpha = 0.55f),
+                borderColor = hair,
                 innerGlowColor = Clear,
             )
         })
@@ -404,7 +413,7 @@ fun fluxThemeComponents(
     val topBar = defaultMillenniumTopAppBarTheme().let { t ->
         MillenniumTopAppBarTheme(
             properties = t.properties.copy(
-                titleStyle = type.headlineSmall,
+                titleStyle = type.headlineMedium,
                 subtitleStyle = type.bodySmall,
                 subtitleForeground = colors.muted,
                 background = ClearBrush,
@@ -420,7 +429,7 @@ fun fluxThemeComponents(
                     background = ClearBrush,
                     shape = Large,
                     shadowElevation = 0.dp,
-                    borderColor = colors.border.copy(alpha = 0.55f),
+                    borderColor = hair,
                     innerGlowColor = Clear,
                 )
             },
@@ -443,11 +452,11 @@ fun fluxThemeComponents(
                     shape = Medium,
                     borderColor = if (state == MillenniumControlState.Focused) colors.accent else Clear,
                     innerGlowColor = Clear,
-                    selectedIndicatorColor = Clear,
+                    selectedIndicatorColor = colors.accentTop,
                 )
             },
             badge = t.badge.mapStates { _, p ->
-                p.copy(background = flux, foreground = colors.onAccent, shape = Pill, borderColor = Clear, innerGlowColor = Clear)
+                p.copy(background = accentFill, foreground = colors.onAccent, shape = Pill, borderColor = Clear, innerGlowColor = Clear)
             },
             trigger = t.trigger.mapStates { _, p ->
                 p.copy(shape = Pill, borderColor = Clear, innerGlowColor = Clear, shadowElevation = 0.dp)
@@ -461,15 +470,15 @@ fun fluxThemeComponents(
                 p.copy(
                     background = ClearBrush,
                     shape = Pill,
-                    borderColor = colors.border.copy(alpha = 0.55f),
+                    borderColor = hair,
                     innerGlowColor = Clear,
-                    shadowElevation = 12.dp,
+                    shadowElevation = 0.dp,
                 )
             },
             item = t.item.mapStates { state, p ->
                 p.copy(
                     background = when (state) {
-                        MillenniumControlState.Selected -> flux
+                        MillenniumControlState.Selected -> wash(0.09f)
                         else -> null
                     },
                     shape = Pill,

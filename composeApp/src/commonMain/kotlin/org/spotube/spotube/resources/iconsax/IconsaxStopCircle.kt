@@ -1,62 +1,37 @@
+/*
+ * Copyright (C) 2026 Kingkor Roy Tirtho and Spotube Contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// Generated from the Spotube Flux echo icons (geometry from Lucide, ISC licence). Do not edit.
+
 package org.spotube.spotube.resources.iconsax
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.PathData
-import androidx.compose.ui.graphics.vector.group
-import androidx.compose.ui.graphics.vector.path
-import androidx.compose.ui.unit.dp
 
 val Iconsax.IconsaxStopCircle: ImageVector
     get() {
-        if (_IconsaxStopCircle != null) {
-            return _IconsaxStopCircle!!
-        }
-        _IconsaxStopCircle = ImageVector.Builder(
+        _IconsaxStopCircle?.let { return it }
+        return fluxIcon(
             name = "IconsaxStopCircle",
-            defaultWidth = 24.dp,
-            defaultHeight = 24.dp,
-            viewportWidth = 24f,
-            viewportHeight = 24f
-        ).apply {
-            group(
-                clipPathData = PathData {
-                    moveTo(0f, 0f)
-                    horizontalLineToRelative(24f)
-                    verticalLineToRelative(24f)
-                    horizontalLineToRelative(-24f)
-                    close()
-                }
-            ) {
-                path(
-                    fill = SolidColor(Color.White),
-                    fillAlpha = 0.4f,
-                    strokeAlpha = 0.4f
-                ) {
-                    moveTo(11.97f, 22f)
-                    curveTo(17.493f, 22f, 21.97f, 17.523f, 21.97f, 12f)
-                    curveTo(21.97f, 6.477f, 17.493f, 2f, 11.97f, 2f)
-                    curveTo(6.447f, 2f, 1.97f, 6.477f, 1.97f, 12f)
-                    curveTo(1.97f, 17.523f, 6.447f, 22f, 11.97f, 22f)
-                    close()
-                }
-                path(fill = SolidColor(Color.White)) {
-                    moveTo(10.77f, 16.229f)
-                    horizontalLineTo(13.23f)
-                    curveTo(14.89f, 16.229f, 16.23f, 14.889f, 16.23f, 13.229f)
-                    verticalLineTo(10.769f)
-                    curveTo(16.23f, 9.11f, 14.89f, 7.77f, 13.23f, 7.77f)
-                    horizontalLineTo(10.77f)
-                    curveTo(9.11f, 7.77f, 7.77f, 9.11f, 7.77f, 10.769f)
-                    verticalLineTo(13.229f)
-                    curveTo(7.77f, 14.889f, 9.11f, 16.229f, 10.77f, 16.229f)
-                    close()
-                }
-            }
-        }.build()
-
-        return _IconsaxStopCircle!!
+            strokes = listOf(
+                "M2 12a10 10 0 1 0 20 0a10 10 0 1 0 -20 0z",
+                "M10 9h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1z",
+            ),
+            fills = emptyList(),
+        ).also { _IconsaxStopCircle = it }
     }
 
 @Suppress("ObjectPropertyName")

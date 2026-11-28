@@ -15,54 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// Generated from the Spotube Flux echo icons (geometry from Lucide, ISC licence). Do not edit.
+
 package org.spotube.spotube.resources.iconsax
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.PathData
-import androidx.compose.ui.graphics.vector.group
-import androidx.compose.ui.graphics.vector.path
-import androidx.compose.ui.unit.dp
 
 val Iconsax.IconsaxHeart2: ImageVector
     get() {
-        if (_IconsaxHeart2 != null) {
-            return _IconsaxHeart2!!
-        }
-        _IconsaxHeart2 = ImageVector.Builder(
+        _IconsaxHeart2?.let { return it }
+        return fluxIcon(
             name = "IconsaxHeart2",
-            defaultWidth = 24.dp,
-            defaultHeight = 24.dp,
-            viewportWidth = 24f,
-            viewportHeight = 24f
-        ).apply {
-            group(
-                clipPathData = PathData {
-                    moveTo(0f, 0f)
-                    horizontalLineToRelative(24f)
-                    verticalLineToRelative(24f)
-                    horizontalLineToRelative(-24f)
-                    close()
-                }
-            ) {
-                path(fill = SolidColor(Color.White)) {
-                    moveTo(16.44f, 3.1f)
-                    curveTo(14.63f, 3.1f, 13.01f, 3.98f, 12f, 5.33f)
-                    curveTo(10.99f, 3.98f, 9.37f, 3.1f, 7.56f, 3.1f)
-                    curveTo(4.49f, 3.1f, 2f, 5.6f, 2f, 8.69f)
-                    curveTo(2f, 9.88f, 2.19f, 10.98f, 2.52f, 12f)
-                    curveTo(4.1f, 17f, 8.97f, 19.99f, 11.38f, 20.81f)
-                    curveTo(11.72f, 20.93f, 12.28f, 20.93f, 12.62f, 20.81f)
-                    curveTo(15.03f, 19.99f, 19.9f, 17f, 21.48f, 12f)
-                    curveTo(21.81f, 10.98f, 22f, 9.88f, 22f, 8.69f)
-                    curveTo(22f, 5.6f, 19.51f, 3.1f, 16.44f, 3.1f)
-                    close()
-                }
-            }
-        }.build()
-
-        return _IconsaxHeart2!!
+            strokes = listOf(
+                "M19.414 14.414C21 12.828 22 11.5 22 9.5a5.5 5.5 0 0 0-9.591-3.676.6.6 0 0 1-.818.001A5.5 5.5 0 0 0 2 9.5c0 2.3 1.5 4 3 5.5l5.535 5.362a2 2 0 0 0 2.879.052 2.12 2.12 0 0 0-.004-3 2.124 2.124 0 1 0 3-3 2.124 2.124 0 0 0 3.004 0 2 2 0 0 0 0-2.828l-1.881-1.882a2.41 2.41 0 0 0-3.409 0l-1.71 1.71a2 2 0 0 1-2.828 0 2 2 0 0 1 0-2.828l2.823-2.762",
+            ),
+            fills = emptyList(),
+        ).also { _IconsaxHeart2 = it }
     }
 
 @Suppress("ObjectPropertyName")

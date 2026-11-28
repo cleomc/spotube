@@ -29,8 +29,8 @@ import org.spotube.spotube.core.ui.misc.TextWithShimmer
 import org.spotube.spotube.core.ui.misc.shimmerApply
 import org.spotube.spotube.core.ui.theming.AppTheme
 import org.spotube.spotube.core.ui.theming.FluxPlayPauseIcon
-import org.spotube.spotube.core.ui.theming.fluxCard
-import org.spotube.spotube.core.ui.theming.fluxNeonBorder
+import org.spotube.spotube.core.ui.theming.fluxHairline
+import org.spotube.spotube.core.ui.theming.fluxPlayingBar
 import org.spotube.spotube.core.ui.theming.fluxPress
 import androidx.compose.ui.graphics.Color
 import org.spotube.spotube.resources.iconsax.Iconsax
@@ -72,13 +72,13 @@ fun PlayableListTile(
     compact: Boolean = false
 ) {
     val colors = MillenniumTheme.colors
-    val tileShape = RoundedCornerShape(if (compact) 14.dp else 18.dp)
-    // Flux: a glass tile with a specular rim; the playing one gets a spinning holographic border.
+    val tileShape = RoundedCornerShape(10.dp)
+    // Flux: a hairline row; the playing one gets a soft wash and an accent tick.
     MillenniumListTile(
         modifier = modifier
             .fluxPress(0.98f)
-            .fluxNeonBorder(tileShape, intensity = if (isPlaying) 1f else 0f)
-            .fluxCard(tileShape),
+            .fluxPlayingBar(isPlaying)
+            .fluxHairline(),
         onClick = onClick ?: onPlay,
         selected = isPlaying,
         background = null,
@@ -87,11 +87,11 @@ fun PlayableListTile(
         titleForeground = if (isBlacklisted) colors.danger else null,
         borderWidth = 1.dp,
         contentPadding = PaddingValues(if (compact) 8.dp else 12.dp),
-        minimumHeight = if (compact) 52.dp else 76.dp,
+        minimumHeight = if (compact) 52.dp else 68.dp,
         leading = {
             MediaArtwork(
                 imageModel, title,
-                Modifier.size(if (compact) 36.dp else 52.dp).sharedElementOrNone(
+                Modifier.size(if (compact) 36.dp else 48.dp).sharedElementOrNone(
                     sharedElementKey,
                     LocalSharedTransitionScope.current,
                     LocalAnimatedVisibilityScope.current

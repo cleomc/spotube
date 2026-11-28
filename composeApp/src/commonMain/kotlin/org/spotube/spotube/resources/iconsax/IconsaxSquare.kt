@@ -15,51 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// Generated from the Spotube Flux echo icons (geometry from Lucide, ISC licence). Do not edit.
+
 package org.spotube.spotube.resources.iconsax
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.path
-import androidx.compose.ui.unit.dp
 
 val Iconsax.IconsaxSquare: ImageVector
     get() {
-        if (_IconsaxSquare != null) {
-            return _IconsaxSquare!!
-        }
-        _IconsaxSquare = ImageVector.Builder(
+        _IconsaxSquare?.let { return it }
+        return fluxIcon(
             name = "IconsaxSquare",
-            defaultWidth = 24.dp,
-            defaultHeight = 24.dp,
-            viewportWidth = 24f,
-            viewportHeight = 24f
-        ).apply {
-            path(fill = SolidColor(Color.White)) {
-                moveTo(15f, 22.75f)
-                horizontalLineTo(9f)
-                curveTo(3.57f, 22.75f, 1.25f, 20.43f, 1.25f, 15f)
-                verticalLineTo(9f)
-                curveTo(1.25f, 3.57f, 3.57f, 1.25f, 9f, 1.25f)
-                horizontalLineTo(15f)
-                curveTo(20.43f, 1.25f, 22.75f, 3.57f, 22.75f, 9f)
-                verticalLineTo(15f)
-                curveTo(22.75f, 20.43f, 20.43f, 22.75f, 15f, 22.75f)
-                close()
-                moveTo(9f, 2.75f)
-                curveTo(4.39f, 2.75f, 2.75f, 4.39f, 2.75f, 9f)
-                verticalLineTo(15f)
-                curveTo(2.75f, 19.61f, 4.39f, 21.25f, 9f, 21.25f)
-                horizontalLineTo(15f)
-                curveTo(19.61f, 21.25f, 21.25f, 19.61f, 21.25f, 15f)
-                verticalLineTo(9f)
-                curveTo(21.25f, 4.39f, 19.61f, 2.75f, 15f, 2.75f)
-                horizontalLineTo(9f)
-                close()
-            }
-        }.build()
-
-        return _IconsaxSquare!!
+            strokes = listOf(
+                "M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2z",
+            ),
+            fills = emptyList(),
+        ).also { _IconsaxSquare = it }
     }
 
 @Suppress("ObjectPropertyName")

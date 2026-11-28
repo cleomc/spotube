@@ -37,12 +37,16 @@ import kotlin.math.sin
  * families that replace Millennium's Blue / Orange / Lime: Flux, Braise and Prisme.
  */
 
+/*
+ * Nuit is tuned for OLED screens: the ground and wells are true black (pixels off), surfaces sit
+ * just above it, and `border` stays at 3:1 on black so hairlines remain visible.
+ */
 private fun nuit(accent: Long, top: Long, bottom: Long) = MillenniumColors(
-    background = Color(0xFF0B0910), surface = Color(0xFF13111A), raised = Color(0xFF1D1A27),
-    inset = Color(0xFF07060A), text = Color(0xFFF4F1FF), muted = Color(0xFFA9A4C2),
-    border = Color(0xFF68638C), highlight = Color.White, accent = Color(accent),
+    background = Color(0xFF000000), surface = Color(0xFF0A090E), raised = Color(0xFF16141D),
+    inset = Color(0xFF000000), text = Color(0xFFF4F1FF), muted = Color(0xFFA9A4C2),
+    border = Color(0xFF5E5A80), highlight = Color.White, accent = Color(accent),
     accentTop = Color(top), accentBottom = Color(bottom), onAccent = Color.White,
-    success = Color(0xFF6FE3B0), danger = Color(0xFFFF7A7A), scrim = Color(0xB8050408),
+    success = Color(0xFF6FE3B0), danger = Color(0xFFFF7A7A), scrim = Color(0xCC000000),
 )
 
 private fun papier(accent: Long, top: Long, bottom: Long) = MillenniumColors(
@@ -93,8 +97,8 @@ fun fluxColorsFor(palette: MillenniumPalette, dark: Boolean, colors: MillenniumC
         flowA = Color(a),
         flowB = Color(b),
         flowC = Color(c),
-        glass = if (dark) Color(0xA313111A) else Color(0xB8F2ECCE),
-        rib = if (dark) Color(0x17FFFFFF) else Color(0x73FFFFFF),
+        glass = if (dark) Color(0xB3050409) else Color(0xB8F2ECCE),
+        rib = if (dark) Color(0x12FFFFFF) else Color(0x73FFFFFF),
         grainBlend = if (dark) Color.White else Color(0xFF2A2410),
     )
 }

@@ -20,7 +20,7 @@ package org.spotube.spotube.core.ui.component
 
 import org.spotube.spotube.core.ui.theming.fluxEnter
 import org.spotube.spotube.core.ui.theming.fluxHalo
-import org.spotube.spotube.core.ui.theming.fluxNeonBorder
+import org.spotube.spotube.core.ui.theming.fluxViewfinder
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.layout.height
 import org.spotube.millennium.composables.MillenniumButton
@@ -238,6 +238,7 @@ fun CollectionDetails(
                 modifier = Modifier
                     .size(if (isCompact) 100.dp else 200.dp)
                     .fluxHalo(true, RoundedCornerShape(16.dp))
+                    .fluxViewfinder(true)
                     .clip(RoundedCornerShape(16.dp))
                     .sharedElementOrNone(
                         key = sharedElementKey,
@@ -289,8 +290,7 @@ fun CollectionDetails(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
-                .fluxEnter()
-                .fluxNeonBorder(RoundedCornerShape(18.dp), width = 1.dp, intensity = 0.5f),
+                .fluxEnter(),
             contentPadding = PaddingValues(0.dp)) {
             if (isCompact) {
                 Column(

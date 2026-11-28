@@ -43,9 +43,12 @@ import org.spotube.millennium.theme.MillenniumColors
 import org.spotube.millennium.theme.MillenniumPalette
 import org.spotube.millennium.theme.resolve
 import spotube.composeapp.generated.resources.Res
-import spotube.composeapp.generated.resources.instrument_sans_variable
-import spotube.composeapp.generated.resources.jetbrains_mono_variable
-import spotube.composeapp.generated.resources.unbounded_variable
+import androidx.compose.ui.text.font.FontStyle
+import spotube.composeapp.generated.resources.doto_variable
+import spotube.composeapp.generated.resources.geist_mono_variable
+import spotube.composeapp.generated.resources.geist_variable
+import spotube.composeapp.generated.resources.instrument_serif_italic
+import spotube.composeapp.generated.resources.instrument_serif_regular
 import org.spotube.millennium.theme.MillenniumTheme
 import org.spotube.millennium.theme.MillenniumThemeConfig
 
@@ -139,7 +142,11 @@ data class AppTypography(
     val time: TextStyle = labelMedium,
     /** Tiny uppercase status labels (LIVE, 256 KBPS). */
     val signal: TextStyle = labelSmall,
-    /** The lowercase spotube wordmark. */
+    /** Dot-matrix readout (Doto): the elapsed time in now playing. One per screen at most. */
+    val readout: TextStyle = time,
+    /** Synced lyrics lines (Instrument Serif). */
+    val lyric: TextStyle = headlineMedium,
+    /** The Spotube wordmark (Instrument Serif italic). */
     val wordmark: TextStyle = headlineLarge,
 )
 
@@ -157,47 +164,57 @@ private fun style(
     letterSpacing = tracking.sp,
 )
 
-/** Spotube Flux type scale: Unbounded for display, Instrument Sans for UI, JetBrains Mono for signal. */
-fun fluxTypography(display: FontFamily, sans: FontFamily, mono: FontFamily) = AppTypography(
-    displaySmall = style(display, 44, 46, FontWeight.Bold, -1.3f),
-    headlineLarge = style(display, 32, 36, FontWeight.Bold, -0.8f),
-    headlineMedium = style(display, 26, 30, FontWeight.SemiBold, -0.5f),
-    headlineSmall = style(display, 20, 26, FontWeight.SemiBold, -0.2f),
-    titleLarge = style(sans, 20, 26, FontWeight.SemiBold),
-    titleMedium = style(sans, 16, 22, FontWeight.SemiBold),
-    titleSmall = style(sans, 14, 20, FontWeight.SemiBold),
+/**
+ * Spotube Flux type scale: Instrument Serif for display (titles, lyrics, wordmark), Geist for the
+ * UI, Geist Mono for data and Doto for the one dot-matrix readout.
+ */
+fun fluxTypography(display: FontFamily, sans: FontFamily, mono: FontFamily, dot: FontFamily) = AppTypography(
+    displaySmall = style(display, 52, 50, tracking = -1.2f),
+    headlineLarge = style(display, 40, 40, tracking = -0.8f),
+    headlineMedium = style(display, 32, 34, tracking = -0.5f),
+    headlineSmall = style(display, 26, 30, tracking = -0.3f),
+    titleLarge = style(sans, 18, 24, FontWeight.SemiBold),
+    titleMedium = style(sans, 16, 22, FontWeight.Medium, -0.1f),
+    titleSmall = style(sans, 14, 20, FontWeight.Medium, -0.1f),
     bodyLarge = style(sans, 16, 24),
     bodyMedium = style(sans, 14, 20),
     bodySmall = style(sans, 12, 16),
-    labelLarge = style(sans, 14, 20, FontWeight.SemiBold),
-    labelMedium = style(sans, 12, 16, FontWeight.SemiBold),
-    labelSmall = style(sans, 11, 14, FontWeight.Bold, 1.2f),
+    labelLarge = style(sans, 14, 20, FontWeight.Medium),
+    labelMedium = style(sans, 12, 16, FontWeight.Medium),
+    labelSmall = style(mono, 10, 12, FontWeight.Medium, 1.4f),
     time = style(mono, 12, 16, FontWeight.Medium).copy(fontFeatureSettings = "tnum"),
     signal = style(mono, 10, 12, FontWeight.Medium, 1.6f),
-    wordmark = style(display, 28, 32, FontWeight.ExtraBold, -1.4f),
+    readout = style(dot, 30, 30, FontWeight.Bold).copy(fontFeatureSettings = "tnum"),
+    lyric = style(display, 30, 36),
+    wordmark = style(display, 30, 30).copy(fontStyle = FontStyle.Italic),
 )
 
-val AppDefaultTypography = fluxTypography(FontFamily.SansSerif, FontFamily.SansSerif, FontFamily.Monospace)
+val AppDefaultTypography = fluxTypography(
+    FontFamily.Serif, FontFamily.SansSerif, FontFamily.Monospace, FontFamily.Monospace,
+)
 
 @OptIn(ExperimentalTextApi::class)
 @Composable
 private fun rememberFluxTypography(): AppTypography {
-    val displayWeights = listOf(FontWeight.SemiBold, FontWeight.Bold, FontWeight.ExtraBold)
     val sansWeights = listOf(FontWeight.Normal, FontWeight.Medium, FontWeight.SemiBold, FontWeight.Bold)
     val monoWeights = listOf(FontWeight.Normal, FontWeight.Medium, FontWeight.Bold)
-    val display = FontFamily(displayWeights.map {
-        Font(Res.font.unbounded_variable, weight = it,
-            variationSettings = FontVariation.Settings(FontVariation.weight(it.weight)))
-    })
+    val display = FontFamily(
+        Font(Res.font.instrument_serif_regular, FontWeight.Normal, FontStyle.Normal),
+        Font(Res.font.instrument_serif_italic, FontWeight.Normal, FontStyle.Italic),
+    )
     val sans = FontFamily(sansWeights.map {
-        Font(Res.font.instrument_sans_variable, weight = it,
+        Font(Res.font.geist_variable, weight = it,
             variationSettings = FontVariation.Settings(FontVariation.weight(it.weight)))
     })
     val mono = FontFamily(monoWeights.map {
-        Font(Res.font.jetbrains_mono_variable, weight = it,
+        Font(Res.font.geist_mono_variable, weight = it,
             variationSettings = FontVariation.Settings(FontVariation.weight(it.weight)))
     })
-    return remember(display, sans, mono) { fluxTypography(display, sans, mono) }
+    val dot = FontFamily(
+        Font(Res.font.doto_variable, weight = FontWeight.Bold,
+            variationSettings = FontVariation.Settings(FontVariation.weight(700)))
+    )
+    return remember(display, sans, mono, dot) { fluxTypography(display, sans, mono, dot) }
 }
 
 /** Corner shapes used by the app. */
@@ -209,9 +226,9 @@ data class AppShapes(
 )
 
 val AppDefaultShapes = AppShapes(
-    small = RoundedCornerShape(12.dp),
-    medium = RoundedCornerShape(18.dp),
-    large = RoundedCornerShape(28.dp)
+    small = RoundedCornerShape(10.dp),
+    medium = RoundedCornerShape(14.dp),
+    large = RoundedCornerShape(22.dp)
 )
 
 val LocalAppColors =

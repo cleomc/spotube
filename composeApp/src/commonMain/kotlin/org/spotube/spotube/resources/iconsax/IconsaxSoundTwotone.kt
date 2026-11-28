@@ -1,96 +1,42 @@
+/*
+ * Copyright (C) 2026 Kingkor Roy Tirtho and Spotube Contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// Generated from the Spotube Flux echo icons (geometry from Lucide, ISC licence). Do not edit.
+
 package org.spotube.spotube.resources.iconsax
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.PathData
-import androidx.compose.ui.graphics.vector.group
-import androidx.compose.ui.graphics.vector.path
-import androidx.compose.ui.unit.dp
 
 val Iconsax.IconsaxSoundTwotone: ImageVector
     get() {
-        if (_IconsaxSoundTwotone != null) {
-            return _IconsaxSoundTwotone!!
-        }
-        _IconsaxSoundTwotone = ImageVector.Builder(
+        _IconsaxSoundTwotone?.let { return it }
+        return fluxIcon(
             name = "IconsaxSoundTwotone",
-            defaultWidth = 24.dp,
-            defaultHeight = 24.dp,
-            viewportWidth = 24f,
-            viewportHeight = 24f
-        ).apply {
-            group(
-                clipPathData = PathData {
-                    moveTo(0f, 0f)
-                    horizontalLineToRelative(24f)
-                    verticalLineToRelative(24f)
-                    horizontalLineToRelative(-24f)
-                    close()
-                }
-            ) {
-                path(fill = SolidColor(Color.White)) {
-                    moveTo(3f, 16.5f)
-                    curveTo(2.59f, 16.5f, 2.25f, 16.16f, 2.25f, 15.75f)
-                    verticalLineTo(8.25f)
-                    curveTo(2.25f, 7.84f, 2.59f, 7.5f, 3f, 7.5f)
-                    curveTo(3.41f, 7.5f, 3.75f, 7.84f, 3.75f, 8.25f)
-                    verticalLineTo(15.75f)
-                    curveTo(3.75f, 16.16f, 3.41f, 16.5f, 3f, 16.5f)
-                    close()
-                }
-                path(
-                    fill = SolidColor(Color.White),
-                    fillAlpha = 0.4f,
-                    strokeAlpha = 0.4f
-                ) {
-                    moveTo(7.5f, 19f)
-                    curveTo(7.09f, 19f, 6.75f, 18.66f, 6.75f, 18.25f)
-                    verticalLineTo(5.75f)
-                    curveTo(6.75f, 5.34f, 7.09f, 5f, 7.5f, 5f)
-                    curveTo(7.91f, 5f, 8.25f, 5.34f, 8.25f, 5.75f)
-                    verticalLineTo(18.25f)
-                    curveTo(8.25f, 18.66f, 7.91f, 19f, 7.5f, 19f)
-                    close()
-                }
-                path(fill = SolidColor(Color.White)) {
-                    moveTo(12f, 21.5f)
-                    curveTo(11.59f, 21.5f, 11.25f, 21.16f, 11.25f, 20.75f)
-                    verticalLineTo(3.25f)
-                    curveTo(11.25f, 2.84f, 11.59f, 2.5f, 12f, 2.5f)
-                    curveTo(12.41f, 2.5f, 12.75f, 2.84f, 12.75f, 3.25f)
-                    verticalLineTo(20.75f)
-                    curveTo(12.75f, 21.16f, 12.41f, 21.5f, 12f, 21.5f)
-                    close()
-                }
-                path(
-                    fill = SolidColor(Color.White),
-                    fillAlpha = 0.4f,
-                    strokeAlpha = 0.4f
-                ) {
-                    moveTo(16.5f, 19f)
-                    curveTo(16.09f, 19f, 15.75f, 18.66f, 15.75f, 18.25f)
-                    verticalLineTo(5.75f)
-                    curveTo(15.75f, 5.34f, 16.09f, 5f, 16.5f, 5f)
-                    curveTo(16.91f, 5f, 17.25f, 5.34f, 17.25f, 5.75f)
-                    verticalLineTo(18.25f)
-                    curveTo(17.25f, 18.66f, 16.91f, 19f, 16.5f, 19f)
-                    close()
-                }
-                path(fill = SolidColor(Color.White)) {
-                    moveTo(21f, 16.5f)
-                    curveTo(20.59f, 16.5f, 20.25f, 16.16f, 20.25f, 15.75f)
-                    verticalLineTo(8.25f)
-                    curveTo(20.25f, 7.84f, 20.59f, 7.5f, 21f, 7.5f)
-                    curveTo(21.41f, 7.5f, 21.75f, 7.84f, 21.75f, 8.25f)
-                    verticalLineTo(15.75f)
-                    curveTo(21.75f, 16.16f, 21.41f, 16.5f, 21f, 16.5f)
-                    close()
-                }
-            }
-        }.build()
-
-        return _IconsaxSoundTwotone!!
+            strokes = listOf(
+                "M4.9 16.1C1 12.2 1 5.8 4.9 1.9",
+                "M7.8 4.7a6.14 6.14 0 0 0-.8 7.5",
+                "M10 9a2 2 0 1 0 4 0a2 2 0 1 0 -4 0z",
+                "M16.2 4.8c2 2 2.26 5.11.8 7.47",
+                "M19.1 1.9a9.96 9.96 0 0 1 0 14.1",
+                "M9.5 18h5",
+                "m8 22 4-11 4 11",
+            ),
+            fills = emptyList(),
+        ).also { _IconsaxSoundTwotone = it }
     }
 
 @Suppress("ObjectPropertyName")
