@@ -163,9 +163,9 @@
     <string name="settings_palette_dialog_description">選擇 Millennium 強調色盤，並在淺色與深色模式中預覽。</string>
     <string name="settings_palette_label">色盤</string>
     <string name="settings_appearance_subtitle_palette">Millennium 色盤與強調色。目前：%1$s</string>
-    <string name="settings_palette_blue">藍色</string>
-    <string name="settings_palette_orange">橘色</string>
-    <string name="settings_palette_lime">萊姆綠</string>
+    <string name="settings_palette_blue">Flux</string>
+    <string name="settings_palette_orange">Braise</string>
+    <string name="settings_palette_lime">Prisme</string>
 
     <string name="settings_download_folder_title">自訂下載資料夾</string>
     <string name="settings_download_folder_current">目前資料夾：%1$s</string>

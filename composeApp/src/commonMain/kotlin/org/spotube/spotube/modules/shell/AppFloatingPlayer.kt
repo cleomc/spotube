@@ -18,6 +18,22 @@
 package org.spotube.spotube.modules.shell
 
 
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import com.composeunstyled.LocalTextStyle
+import org.spotube.spotube.core.ui.theming.FluxEqualizer
+import org.spotube.spotube.core.ui.theming.FluxPlayPauseIcon
+import org.spotube.spotube.core.ui.theming.fluxGlass
+import org.spotube.spotube.core.ui.theming.fluxHalo
+import org.spotube.spotube.core.ui.theming.fluxPress
+import org.spotube.spotube.core.ui.theming.fluxProgressRing
+import androidx.compose.ui.graphics.Brush
 import org.spotube.millennium.composables.MillenniumIcon
 import org.spotube.millennium.composables.MillenniumIconButton
 import org.spotube.millennium.composables.MillenniumIconButtonStyle
@@ -70,7 +86,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.spotube.spotube.core.audioplayer.AudioPlayerInterface
 
-internal val FloatingPlayerContentHeight = 64.dp
+internal val FloatingPlayerContentHeight = 76.dp
 internal val FloatingPlayerBottomBleed = 16.dp
 
 // The floating player on small screens that appears above the floating AppBottombar
@@ -132,35 +148,48 @@ internal fun FloatingPlayerContent(
     heartButton: @Composable () -> Unit
 ) {
     val coverModel = playerUiState.coverModel
+    val flux = AppTheme.flux
+    val capsule = RoundedCornerShape(22.dp)
+    val hair = AppTheme.colors.outline.copy(alpha = 0.5f)
+    val progress by animateFloatAsState(playerUiState.progress, tween(300))
 
+    // Flux: a floating glass panel above the bottom bar, with the progress as a 1.5dp accent line
+    // along its bottom edge and a progress ring around the ink play disc.
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(FloatingPlayerContentHeight + FloatingPlayerBottomBleed)
-            .millenniumSurface(
-                background = millenniumPanelBrush(MillenniumTheme.colors),
-                shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp),
-                borderColor = MillenniumTheme.colors.border,
-                borderWidth = 1.dp,
-            )
+            .padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = FloatingPlayerBottomBleed + 6.dp)
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                // Only the surface extends beneath the navigation bar, not the controls.
-                .padding(bottom = FloatingPlayerBottomBleed)
+                .fluxGlass(capsule)
+                .drawWithContent {
+                    drawContent()
+                    val y = size.height - 3.dp.toPx()
+                    val inset = 18.dp.toPx()
+                    val w = size.width - 2 * inset
+                    drawLine(
+                        color = hair, start = Offset(inset, y), end = Offset(inset + w, y),
+                        strokeWidth = 1.dp.toPx(), cap = StrokeCap.Round
+                    )
+                    if (progress > 0f) {
+                        val end = Offset(inset + w * progress.coerceIn(0f, 1f), y)
+                        drawLine(
+                            brush = Brush.horizontalGradient(
+                                listOf(flux.accentTop, flux.accentBottom), startX = inset, endX = inset + w,
+                            ),
+                            start = Offset(inset, y), end = end,
+                            strokeWidth = 1.5.dp.toPx(), cap = StrokeCap.Round
+                        )
+                    }
+                }
         ) {
-            MillenniumProgress(
-                progress = playerUiState.progress,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(2.dp)
-            )
-            Spacer(modifier = Modifier.height(10.dp))
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp),
+                    .fillMaxSize()
+                    .padding(start = 10.dp, end = 10.dp, bottom = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -168,12 +197,14 @@ internal fun FloatingPlayerContent(
                     modifier = Modifier.weight(1f),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    val artShape = RoundedCornerShape(10.dp)
                     Box(
                         modifier = Modifier
-                            .size(42.dp)
+                            .size(46.dp)
+                            .fluxHalo(playerUiState.isPlaying, artShape)
                             .then(albumArtModifier)
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(AppTheme.colors.onSurface.copy(alpha = 0.12f)),
+                            .clip(artShape)
+                            .background(AppTheme.colors.surfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
                         if (coverModel != null) AsyncImage(
@@ -188,14 +219,22 @@ internal fun FloatingPlayerContent(
                             tint = AppTheme.colors.onSurfaceVariant, modifier = Modifier.size(22.dp)
                         )
                     }
-                    Column(modifier = Modifier.padding(start = 10.dp)) {
-                        Text(
-                            text = if (playerUiState.queue.isEmpty()) stringResource(Res.string.player_nothing_playing) else playerUiState.title,
-                            style = AppTheme.typography.bodyMedium,
-                            color = AppTheme.colors.onSurface,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                    Column(modifier = Modifier.padding(start = 12.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (playerUiState.queue.isNotEmpty()) {
+                                FluxEqualizer(
+                                    playing = playerUiState.isPlaying,
+                                    modifier = Modifier.padding(end = 8.dp)
+                                )
+                            }
+                            Text(
+                                text = if (playerUiState.queue.isEmpty()) stringResource(Res.string.player_nothing_playing) else playerUiState.title,
+                                style = AppTheme.typography.titleSmall,
+                                color = AppTheme.colors.onSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                         if (playerUiState.queue.isNotEmpty()) Text(
                             text = playerUiState.artists,
                             style = AppTheme.typography.bodySmall,
@@ -208,15 +247,20 @@ internal fun FloatingPlayerContent(
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     heartButton()
-                    Spacer(modifier = Modifier.size(8.dp))
+                    Spacer(modifier = Modifier.size(12.dp))
                     MillenniumIconButton(
                         onClick = onPlayPause,
                         enabled = playerUiState.queue.isNotEmpty(),
-                        style = MillenniumIconButtonStyle.Secondary
+                        style = MillenniumIconButtonStyle.Primary,
+                        modifier = Modifier
+                            .fluxPress(0.94f)
+                            .fluxProgressRing(playerUiState.progress, inset = 4.dp)
                     ) {
-                        MillenniumIcon(
-                            if (playerUiState.isPlaying) Iconsax.IconsaxPause else Iconsax.IconsaxPlay,
-                            contentDescription = stringResource(if (playerUiState.isPlaying) Res.string.player_pause_content_description else Res.string.player_play_content_description)
+                        FluxPlayPauseIcon(
+                            playing = playerUiState.isPlaying,
+                            contentDescription = stringResource(if (playerUiState.isPlaying) Res.string.player_pause_content_description else Res.string.player_play_content_description),
+                            color = LocalTextStyle.current.color,
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                 }

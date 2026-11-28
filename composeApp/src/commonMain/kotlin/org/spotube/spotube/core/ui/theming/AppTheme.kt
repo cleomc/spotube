@@ -17,7 +17,6 @@
 
 package org.spotube.spotube.core.ui.theming
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -33,18 +32,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.font.FontVariation
+import org.jetbrains.compose.resources.Font
 import org.spotube.spotube.modules.settings.Theme
 import org.spotube.spotube.modules.settings.UserSettings
-import org.spotube.millennium.composables.MillenniumModalBottomSheetTheme
 import org.spotube.millennium.composables.MillenniumTooltipHost
-import org.spotube.millennium.composables.MillenniumTopAppBarTheme
-import org.spotube.millennium.composables.MillenniumTopAppBarThemeProperties
-import org.spotube.millennium.composables.defaultMillenniumModalBottomSheetTheme
-import org.spotube.millennium.composables.defaultMillenniumTopAppBarTheme
 import org.spotube.millennium.theme.MillenniumColors
-import org.spotube.millennium.theme.MillenniumDarkThemeComponents
-import org.spotube.millennium.theme.MillenniumLightThemeComponents
 import org.spotube.millennium.theme.MillenniumPalette
+import org.spotube.millennium.theme.resolve
+import spotube.composeapp.generated.resources.Res
+import androidx.compose.ui.text.font.FontStyle
+import spotube.composeapp.generated.resources.doto_variable
+import spotube.composeapp.generated.resources.geist_mono_variable
+import spotube.composeapp.generated.resources.geist_variable
+import spotube.composeapp.generated.resources.instrument_serif_italic
+import spotube.composeapp.generated.resources.instrument_serif_regular
 import org.spotube.millennium.theme.MillenniumTheme
 import org.spotube.millennium.theme.MillenniumThemeConfig
 
@@ -133,35 +137,85 @@ data class AppTypography(
     val bodySmall: TextStyle,
     val labelLarge: TextStyle,
     val labelMedium: TextStyle,
-    val labelSmall: TextStyle
+    val labelSmall: TextStyle,
+    /** Timestamps, durations, track numbers (mono, tabular figures). */
+    val time: TextStyle = labelMedium,
+    /** Tiny uppercase status labels (LIVE, 256 KBPS). */
+    val signal: TextStyle = labelSmall,
+    /** Dot-matrix readout (Doto): the elapsed time in now playing. One per screen at most. */
+    val readout: TextStyle = time,
+    /** Synced lyrics lines (Instrument Serif). */
+    val lyric: TextStyle = headlineMedium,
+    /** The Spotube wordmark (Instrument Serif italic). */
+    val wordmark: TextStyle = headlineLarge,
 )
 
 private fun style(
+    family: FontFamily,
     size: Int,
     lineHeight: Int,
-    weight: FontWeight = FontWeight.Normal
+    weight: FontWeight = FontWeight.Normal,
+    tracking: Float = 0f,
 ): TextStyle = TextStyle(
-    fontFamily = FontFamily.SansSerif,
+    fontFamily = family,
     fontSize = size.sp,
     lineHeight = lineHeight.sp,
-    fontWeight = weight
+    fontWeight = weight,
+    letterSpacing = tracking.sp,
 )
 
-val AppDefaultTypography = AppTypography(
-    displaySmall = style(36, 44),
-    headlineLarge = style(32, 40),
-    headlineMedium = style(28, 36),
-    headlineSmall = style(24, 32),
-    titleLarge = style(22, 28, FontWeight.Medium),
-    titleMedium = style(16, 24, FontWeight.Medium),
-    titleSmall = style(14, 20, FontWeight.Medium),
-    bodyLarge = style(16, 24),
-    bodyMedium = style(14, 20),
-    bodySmall = style(12, 16),
-    labelLarge = style(14, 20, FontWeight.Medium),
-    labelMedium = style(12, 16, FontWeight.Medium),
-    labelSmall = style(11, 16, FontWeight.Medium)
+/**
+ * Spotube Flux type scale: Instrument Serif for display (titles, lyrics, wordmark), Geist for the
+ * UI, Geist Mono for data and Doto for the one dot-matrix readout.
+ */
+fun fluxTypography(display: FontFamily, sans: FontFamily, mono: FontFamily, dot: FontFamily) = AppTypography(
+    displaySmall = style(display, 52, 50, tracking = -1.2f),
+    headlineLarge = style(display, 40, 40, tracking = -0.8f),
+    headlineMedium = style(display, 32, 34, tracking = -0.5f),
+    headlineSmall = style(display, 26, 30, tracking = -0.3f),
+    titleLarge = style(sans, 18, 24, FontWeight.SemiBold),
+    titleMedium = style(sans, 16, 22, FontWeight.Medium, -0.1f),
+    titleSmall = style(sans, 14, 20, FontWeight.Medium, -0.1f),
+    bodyLarge = style(sans, 16, 24),
+    bodyMedium = style(sans, 14, 20),
+    bodySmall = style(sans, 12, 16),
+    labelLarge = style(sans, 14, 20, FontWeight.Medium),
+    labelMedium = style(sans, 12, 16, FontWeight.Medium),
+    labelSmall = style(mono, 10, 12, FontWeight.Medium, 1.4f),
+    time = style(mono, 12, 16, FontWeight.Medium).copy(fontFeatureSettings = "tnum"),
+    signal = style(mono, 10, 12, FontWeight.Medium, 1.6f),
+    readout = style(dot, 30, 30, FontWeight.Bold).copy(fontFeatureSettings = "tnum"),
+    lyric = style(display, 30, 36),
+    wordmark = style(display, 30, 30).copy(fontStyle = FontStyle.Italic),
 )
+
+val AppDefaultTypography = fluxTypography(
+    FontFamily.Serif, FontFamily.SansSerif, FontFamily.Monospace, FontFamily.Monospace,
+)
+
+@OptIn(ExperimentalTextApi::class)
+@Composable
+private fun rememberFluxTypography(): AppTypography {
+    val sansWeights = listOf(FontWeight.Normal, FontWeight.Medium, FontWeight.SemiBold, FontWeight.Bold)
+    val monoWeights = listOf(FontWeight.Normal, FontWeight.Medium, FontWeight.Bold)
+    val display = FontFamily(
+        Font(Res.font.instrument_serif_regular, FontWeight.Normal, FontStyle.Normal),
+        Font(Res.font.instrument_serif_italic, FontWeight.Normal, FontStyle.Italic),
+    )
+    val sans = FontFamily(sansWeights.map {
+        Font(Res.font.geist_variable, weight = it,
+            variationSettings = FontVariation.Settings(FontVariation.weight(it.weight)))
+    })
+    val mono = FontFamily(monoWeights.map {
+        Font(Res.font.geist_mono_variable, weight = it,
+            variationSettings = FontVariation.Settings(FontVariation.weight(it.weight)))
+    })
+    val dot = FontFamily(
+        Font(Res.font.doto_variable, weight = FontWeight.Bold,
+            variationSettings = FontVariation.Settings(FontVariation.weight(700)))
+    )
+    return remember(display, sans, mono, dot) { fluxTypography(display, sans, mono, dot) }
+}
 
 /** Corner shapes used by the app. */
 @Immutable
@@ -172,29 +226,42 @@ data class AppShapes(
 )
 
 val AppDefaultShapes = AppShapes(
-    small = RoundedCornerShape(8.dp),
-    medium = RoundedCornerShape(12.dp),
-    large = RoundedCornerShape(16.dp)
+    small = RoundedCornerShape(10.dp),
+    medium = RoundedCornerShape(14.dp),
+    large = RoundedCornerShape(22.dp)
 )
 
 val LocalAppColors =
-    staticCompositionLocalOf { appColorsFrom(org.spotube.millennium.theme.MillenniumLightColors) }
+    staticCompositionLocalOf { appColorsFrom(FluxColorSchemes.dark) }
 val LocalAppTypography = staticCompositionLocalOf { AppDefaultTypography }
 val LocalAppShapes = staticCompositionLocalOf { AppDefaultShapes }
+val LocalFluxColors = staticCompositionLocalOf {
+    fluxColorsFor(MillenniumPalette.Blue, true, FluxColorSchemes.dark)
+}
 
 /** Reads the active app theme tokens, all backed by Millennium. */
 object AppTheme {
     val colors: AppColors @Composable get() = LocalAppColors.current
     val typography: AppTypography @Composable get() = LocalAppTypography.current
     val shapes: AppShapes @Composable get() = LocalAppShapes.current
+
+    /** Flux-only roles: aurora colours, glass, grain. */
+    val flux: FluxColors @Composable get() = LocalFluxColors.current
+
+    /** The flux fill (accentTop to accentBottom at 120°): the only loud fill of the app. */
+    val fluxBrush: Brush
+        @Composable get() {
+            val flux = LocalFluxColors.current
+            return remember(flux) { FluxGradientBrush(flux.accentTop, flux.accentBottom) }
+        }
 }
 
 /**
  * The app's single source of truth for colour.
  *
- * Installs [MillenniumTheme] with the user's selected [UserSettings.palette] and light/dark
- * [UserSettings.theme], then derives the app's semantic [AppColors], [AppTypography] and
- * [AppShapes] tokens from the active Millennium theme.
+ * Installs [MillenniumTheme] with the Spotube Flux palettes ([FluxColorSchemes]) and component
+ * themes ([fluxThemeComponents]) for the user's selected [UserSettings.palette] and light/dark
+ * [UserSettings.theme], then derives the app's [AppColors], [AppTypography] and [AppShapes].
  */
 @Composable
 fun SpotubeTheme(
@@ -207,59 +274,40 @@ fun SpotubeTheme(
         Theme.SYSTEM -> isSystemDarkTheme()
     }
     val palette: MillenniumPalette = settings.palette
+    val typography = rememberFluxTypography()
 
-    val darkTheme = MillenniumDarkThemeComponents
-    val lightTheme = MillenniumLightThemeComponents
+    val lightTheme = remember(palette, typography) {
+        fluxThemeComponents(FluxColorSchemes.resolve(palette, dark = false), typography)
+    }
+    val darkTheme = remember(palette, typography) {
+        fluxThemeComponents(FluxColorSchemes.resolve(palette, dark = true), typography)
+    }
 
     MillenniumTheme(
         dark = isDarkTheme,
         config = MillenniumThemeConfig(
+            colorSchemes = FluxColorSchemes,
             palette = palette,
-            dark = darkTheme.copy(
-                topAppBarTheme = MillenniumTopAppBarTheme(
-                    properties = darkTheme.topAppBarTheme.properties.copy(
-                        separatorColor = Color.Transparent
-                    )
-                ),
-                modalBottomSheetTheme = compactModalBottomSheetTheme()
-            ),
-            light = lightTheme.copy(
-                topAppBarTheme = MillenniumTopAppBarTheme(
-                    properties = lightTheme.topAppBarTheme.properties.copy(
-                        separatorColor = Color.Transparent
-                    )
-                ),
-                modalBottomSheetTheme = compactModalBottomSheetTheme()
-            )
+            dark = darkTheme,
+            light = lightTheme,
         )
     ) {
-        val colors = appColorsFrom(MillenniumTheme.colors)
+        val millenniumColors: MillenniumColors = MillenniumTheme.colors
+        val colors = appColorsFrom(millenniumColors)
+        val flux = remember(palette, isDarkTheme, millenniumColors) {
+            fluxColorsFor(palette, isDarkTheme, millenniumColors)
+        }
         MillenniumTooltipHost {
             CompositionLocalProvider(
                 LocalAppColors provides colors,
-                LocalAppTypography provides AppDefaultTypography,
+                LocalAppTypography provides typography,
                 LocalAppShapes provides AppDefaultShapes,
-                content = content
-            )
+                LocalFluxColors provides flux,
+            ) {
+                ProvideFluxAmbient(content)
+            }
         }
     }
-}
-
-/** Library default is 24dp padding + 16dp spacing, which is far too roomy on phones. */
-private fun compactModalBottomSheetTheme(): MillenniumModalBottomSheetTheme {
-    val padding = PaddingValues(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 8.dp)
-    fun org.spotube.millennium.composables.MillenniumModalBottomSheetThemeProperties.compact() =
-        copy(contentPadding = padding, contentSpacing = 8.dp)
-    val states = defaultMillenniumModalBottomSheetTheme().states
-    return MillenniumModalBottomSheetTheme(
-        states = org.spotube.millennium.theme.MillenniumControlStateProperty(
-            default = states.default.compact(),
-            hovered = states.hovered.compact(),
-            focused = states.focused.compact(),
-            pressed = states.pressed.compact(),
-            disabled = states.disabled.compact(),
-            selected = states.selected.compact(),
-            error = states.error.compact()))
 }
 
 /** Whether the active Millennium appearance is light. */

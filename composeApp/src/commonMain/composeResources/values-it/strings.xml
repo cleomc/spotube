@@ -167,9 +167,9 @@
     <string name="settings_palette_dialog_description">Scegli una palette di accento Millennium e visualizzane l\'anteprima in chiaro e scuro.</string>
     <string name="settings_palette_label">Palette</string>
     <string name="settings_appearance_subtitle_palette">Palette e accento Millennium. Attuale: %1$s</string>
-    <string name="settings_palette_blue">Blu</string>
-    <string name="settings_palette_orange">Arancione</string>
-    <string name="settings_palette_lime">Lime</string>
+    <string name="settings_palette_blue">Flux</string>
+    <string name="settings_palette_orange">Braise</string>
+    <string name="settings_palette_lime">Prisme</string>
 
     <string name="settings_download_folder_title">Cartella di download personalizzata</string>
     <string name="settings_download_folder_current">Cartella attuale: %1$s</string>

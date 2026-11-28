@@ -17,6 +17,9 @@
 
 package org.spotube.spotube.modules.shell
 
+import org.spotube.spotube.core.ui.theming.fluxGlass
+import spotube.composeapp.generated.resources.welcome_app_name
+import org.spotube.spotube.core.ui.theming.FluxWordmark
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -84,7 +87,6 @@ import org.spotube.millennium.composables.MillenniumSidebarItem
 import org.spotube.millennium.composables.MillenniumSidebarMenu
 import org.spotube.millennium.composables.MillenniumSidebarTrigger
 import spotube.composeapp.generated.resources.Res
-import spotube.composeapp.generated.resources.cookie_regular
 import spotube.composeapp.generated.resources.settings_screen_title
 import spotube.composeapp.generated.resources.support_button_label
 import spotube.composeapp.generated.resources.shell_sidebar_toggle_content_description
@@ -106,9 +108,9 @@ fun AppSidebar(
     val openSupport = LocalSupportPrompt.current
 
     MillenniumSidebar(
-        modifier = modifier,
+        modifier = modifier.fluxGlass(AppTheme.shapes.large),
         collapsed = !expanded,
-        shape = RectangleShape,
+        shape = AppTheme.shapes.large,
         onCollapsedChange = { expanded = !it },
     ) {
         MillenniumSidebarHeader {
@@ -118,15 +120,7 @@ fun AppSidebar(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 AnimatedVisibility(visible = expanded, enter = fadeIn(), exit = fadeOut()) {
-                    Text(
-                        text = "Spotube",
-                        style = AppTheme.typography.headlineLarge.copy(
-                            fontFamily = FontFamily(
-                                listOf(Font(Res.font.cookie_regular, weight = FontWeight.Normal))
-                            )
-                        ),
-                        color = AppTheme.colors.onSurface
-                    )
+                    FluxWordmark(stringResource(Res.string.welcome_app_name))
                 }
                 MillenniumSidebarTrigger {
                     MillenniumIconButton(
@@ -206,6 +200,7 @@ fun AppSidebar(
                 label = stringResource(Res.string.settings_screen_title),
                 onClick = { navigator.navigate(Routes.Settings) },
                 selected = navigationState.topLevelRoute == Routes.Settings,
+                background = if (navigationState.topLevelRoute == Routes.Settings) AppTheme.fluxBrush else null,
                 contentDescription = stringResource(Res.string.settings_screen_title),
                 icon = Iconsax.IconsaxSetting2
             )
@@ -230,6 +225,7 @@ private fun SidebarNavItem(
         label = title,
         onClick = onClick,
         selected = selected,
+        background = if (selected) AppTheme.fluxBrush else null,
         contentDescription = title,
         icon = item.icon
     )
@@ -246,6 +242,7 @@ private fun LiveSidebarNavItem(
     MillenniumSidebarItem(
         onClick = onClick,
         selected = selected,
+        background = if (selected) AppTheme.fluxBrush else null,
         contentDescription = "$title, $status"
     ) {
         // Match the text overload's icon metrics so live rows line up with their siblings.

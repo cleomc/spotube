@@ -173,9 +173,9 @@
     <string name="settings_palette_dialog_description">اختر لوحة ألوان تمييز Millennium واعرض معاينتها في الوضعين الفاتح والداكن.</string>
     <string name="settings_palette_label">لوحة الألوان</string>
     <string name="settings_appearance_subtitle_palette">لوحة ألوان Millennium ولون التمييز. الحالية: %1$s</string>
-    <string name="settings_palette_blue">أزرق</string>
-    <string name="settings_palette_orange">برتقالي</string>
-    <string name="settings_palette_lime">ليموني</string>
+    <string name="settings_palette_blue">Flux</string>
+    <string name="settings_palette_orange">Braise</string>
+    <string name="settings_palette_lime">Prisme</string>
 
     <string name="settings_download_folder_title">تخصيص مجلد التنزيل</string>
     <string name="settings_download_folder_current">المجلد الحالي: %1$s</string>

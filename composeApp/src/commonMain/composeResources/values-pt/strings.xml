@@ -167,9 +167,9 @@
     <string name="settings_palette_dialog_description">Escolha uma paleta de destaque Millennium e veja como fica no claro e no escuro.</string>
     <string name="settings_palette_label">Paleta</string>
     <string name="settings_appearance_subtitle_palette">Paleta Millennium e destaque. Atual: %1$s</string>
-    <string name="settings_palette_blue">Azul</string>
-    <string name="settings_palette_orange">Laranja</string>
-    <string name="settings_palette_lime">Lima</string>
+    <string name="settings_palette_blue">Flux</string>
+    <string name="settings_palette_orange">Braise</string>
+    <string name="settings_palette_lime">Prisme</string>
 
     <string name="settings_download_folder_title">Pasta de download personalizada</string>
     <string name="settings_download_folder_current">Pasta atual: %1$s</string>

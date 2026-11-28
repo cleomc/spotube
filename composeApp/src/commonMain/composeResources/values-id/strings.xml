@@ -163,9 +163,9 @@
     <string name="settings_palette_dialog_description">Pilih palet aksen Millennium dan pratinjau dalam mode terang dan gelap.</string>
     <string name="settings_palette_label">Palet</string>
     <string name="settings_appearance_subtitle_palette">Palet dan aksen Millennium. Saat ini: %1$s</string>
-    <string name="settings_palette_blue">Biru</string>
-    <string name="settings_palette_orange">Jingga</string>
-    <string name="settings_palette_lime">Hijau Limau</string>
+    <string name="settings_palette_blue">Flux</string>
+    <string name="settings_palette_orange">Braise</string>
+    <string name="settings_palette_lime">Prisme</string>
 
     <string name="settings_download_folder_title">Ganti folder unduhan</string>
     <string name="settings_download_folder_current">Folder saat ini: %1$s</string>

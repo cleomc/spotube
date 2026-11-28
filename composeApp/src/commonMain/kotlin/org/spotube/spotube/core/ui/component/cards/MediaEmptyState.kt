@@ -40,7 +40,7 @@ internal fun MediaEmptyState(
             Box(
                 Modifier.size(64.dp).millenniumSurface(
                     background = millenniumBevelBrush(MillenniumTheme.colors),
-                    shape = RoundedCornerShape(14.dp),
+                    shape = RoundedCornerShape(18.dp),
                     borderColor = MillenniumTheme.colors.border,
                     borderWidth = 1.dp
                 ),

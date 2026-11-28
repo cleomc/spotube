@@ -165,9 +165,9 @@
     <string name="settings_palette_dialog_description">Wähle eine Millennium-Akzentpalette und sieh sie dir hell und dunkel an.</string>
     <string name="settings_palette_label">Palette</string>
     <string name="settings_appearance_subtitle_palette">Millennium-Palette und Akzent. Aktuell: %1$s</string>
-    <string name="settings_palette_blue">Blau</string>
-    <string name="settings_palette_orange">Orange</string>
-    <string name="settings_palette_lime">Limette</string>
+    <string name="settings_palette_blue">Flux</string>
+    <string name="settings_palette_orange">Braise</string>
+    <string name="settings_palette_lime">Prisme</string>
 
     <string name="settings_download_folder_title">Eigener Download-Ordner</string>
     <string name="settings_download_folder_current">Aktueller Ordner: %1$s</string>

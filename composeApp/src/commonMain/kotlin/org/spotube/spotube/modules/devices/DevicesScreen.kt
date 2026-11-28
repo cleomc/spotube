@@ -18,6 +18,7 @@
 package org.spotube.spotube.modules.devices
 
 
+import org.spotube.spotube.core.ui.theming.fluxBackground
 import org.spotube.millennium.composables.MillenniumButton
 import org.spotube.millennium.composables.MillenniumButtonStyle
 import org.spotube.millennium.composables.MillenniumCard
@@ -116,7 +117,7 @@ fun DevicesScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MillenniumTheme.colors.background)
+            .fluxBackground()
     ) {
         ApplicationMainBar(
             backButton = true,

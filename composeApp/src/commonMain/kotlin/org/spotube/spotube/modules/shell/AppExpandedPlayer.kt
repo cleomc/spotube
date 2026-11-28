@@ -18,6 +18,17 @@
 package org.spotube.spotube.modules.shell
 
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.ui.graphics.graphicsLayer
+import org.spotube.spotube.core.ui.theming.FluxPlayPauseIcon
+import org.spotube.spotube.core.ui.theming.fluxHalo
+import org.spotube.spotube.core.ui.theming.FluxIcon
+import org.spotube.spotube.core.ui.theming.FluxScope
+import org.spotube.spotube.core.ui.theming.fluxProgressRing
+import org.spotube.spotube.core.ui.theming.fluxViewfinder
+import org.spotube.spotube.core.ui.theming.fluxPress
+import org.spotube.spotube.core.ui.theming.fluxBackground
 import org.spotube.millennium.composables.MillenniumIcon
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -35,6 +46,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
@@ -281,7 +293,7 @@ fun AppExpandedPlayer(
         }
     }
 
-    Box(modifier = modifier.fillMaxSize().background(AppTheme.colors.background)) {
+    Box(modifier = modifier.fillMaxSize().fluxBackground()) {
         if (playerOptionsUiState.isMoreOptionsSheetOpen) {
             MillenniumModalBottomSheet(
                 state = moreOptionsSheetState,
@@ -493,10 +505,20 @@ fun AppExpandedPlayer(
                     .padding(top = 20.dp, bottom = 24.dp),
                 contentAlignment = Alignment.Center
             ) {
+                // Flux: the cover breathes in when playback starts and sinks back when paused,
+                // casting its light below and framed by viewfinder marks.
+                val artScale by animateFloatAsState(
+                    if (playerUiState.isPlaying) 1f else 0.9f,
+                    spring(dampingRatio = 0.55f, stiffness = 260f),
+                    label = "art-breathe"
+                )
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(0.84f)
                         .aspectRatio(1f)
+                        .graphicsLayer { scaleX = artScale; scaleY = artScale }
+                        .fluxHalo(true, RoundedCornerShape(22.dp))
+                        .fluxViewfinder(true)
                         .then(albumArtModifier)
                         .clip(RoundedCornerShape(22.dp))
                         .background(AppTheme.colors.surfaceContainerHighest)
@@ -510,10 +532,18 @@ fun AppExpandedPlayer(
                 }
             }
 
+            FluxScope(
+                playing = playerUiState.isPlaying,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(28.dp)
+                    .padding(horizontal = 24.dp)
+            )
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 2.dp),
+                    .padding(top = 12.dp, start = 2.dp, end = 2.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -527,7 +557,7 @@ fun AppExpandedPlayer(
                 ) {
                     Text(
                         text = playerUiState.title,
-                        style = AppTheme.typography.headlineSmall,
+                        style = AppTheme.typography.headlineMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         textAlign = TextAlign.Center
@@ -576,12 +606,12 @@ fun AppExpandedPlayer(
                 ) {
                     Text(
                         text = formatPlayerTime(playerUiState.position),
-                        style = AppTheme.typography.labelSmall,
-                        color = AppTheme.colors.onSurfaceVariant
+                        style = AppTheme.typography.readout.copy(fontSize = 22.sp, lineHeight = 24.sp),
+                        color = AppTheme.colors.onSurface
                     )
                     Text(
                         text = formatPlayerTime(playerUiState.displayDuration),
-                        style = AppTheme.typography.labelSmall,
+                        style = AppTheme.typography.time,
                         color = AppTheme.colors.onSurfaceVariant
                     )
                 }
@@ -612,17 +642,25 @@ fun AppExpandedPlayer(
                         enabled = !isJamGuest,
                         style = MillenniumIconButtonStyle.Quiet
                     ) {
-                        MillenniumIcon(Iconsax.IconsaxPrevious, contentDescription = stringResource(Res.string.player_previous_content_description))
+                        FluxIcon(
+                            Iconsax.IconsaxPrevious,
+                            contentDescription = stringResource(Res.string.player_previous_content_description),
+                            tint = AppTheme.colors.onSurface,
+                            pulse = true,
+                        )
                     }
                     MillenniumIconButton(
                         onClick = ::onPlayPause,
-                        style = MillenniumIconButtonStyle.Primary
+                        style = MillenniumIconButtonStyle.Primary,
+                        modifier = Modifier
+                            .fluxPress(0.94f)
+                            .fluxProgressRing(playerUiState.progress)
                     ) {
-                        MillenniumIcon(
-                            if (playerUiState.isPlaying) Iconsax.IconsaxPause else Iconsax.IconsaxPlay,
+                        FluxPlayPauseIcon(
+                            playing = playerUiState.isPlaying,
                             contentDescription = stringResource(if (playerUiState.isPlaying) Res.string.player_pause_content_description else Res.string.player_play_content_description),
-                            modifier = Modifier.size(30.dp),
-                            tint = LocalTextStyle.current.color
+                            color = LocalTextStyle.current.color,
+                            modifier = Modifier.size(26.dp)
                         )
                     }
                     MillenniumIconButton(
@@ -630,7 +668,12 @@ fun AppExpandedPlayer(
                         enabled = !isJamGuest,
                         style = MillenniumIconButtonStyle.Quiet
                     ) {
-                        MillenniumIcon(Iconsax.IconsaxNext, contentDescription = stringResource(Res.string.player_next_content_description))
+                        FluxIcon(
+                            Iconsax.IconsaxNext,
+                            contentDescription = stringResource(Res.string.player_next_content_description),
+                            tint = AppTheme.colors.onSurface,
+                            pulse = true,
+                        )
                     }
                     MillenniumIconButton(
                         onClick = ::onLoopToggle,

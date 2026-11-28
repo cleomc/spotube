@@ -1,0 +1,185 @@
+name: Flux Android APK
+
+# Builds the Android APK of the Spotube Flux fork and publishes it on GitHub Releases.
+#
+# - Push to master        -> APK attached to the rolling pre-release "flux-latest".
+# - Push a tag "v*"       -> APK attached to a release for that tag.
+# - Pull request          -> same as a push to master (PRs from forks: workflow artifact only).
+# - Manual run            -> same as a push to master.
+#
+# Signing: add the repository secrets KEYSTORE (base64 of a .jks), KEYSTORE_PASSWORD,
+# KEYSTORE_KEY_ALIAS and KEYSTORE_KEY_PASSWORD to get a signed release APK that updates in place.
+# Without them each run signs with a throwaway key: the APK installs fine but cannot update
+# an APK built by another run (uninstall first).
+
+on:
+  push:
+    branches: [master]
+    tags: ['v*']
+    paths-ignore:
+      - '**.md'
+      - 'packaging/**'
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: flux-android-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  COMPOSE_WEBVIEW_REPO: KRTirtho/ComposeNativeWebview
+  # Same commit as spotube-release-binary.yml (fix/linux-wayland-input)
+  COMPOSE_WEBVIEW_COMMIT: b11ac748de1219f9432338c067a2c5dafef3072a
+
+jobs:
+  # Android only: no desktop or iOS build runs here (spotube-release-binary.yml, run by hand,
+  # still covers every platform).
+  build-apk:
+    name: Build APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    outputs:
+      apk-name: ${{ steps.apk.outputs.name }}
+    steps:
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost "$AGENT_TOOLSDIRECTORY" || true
+          df -h /
+
+      - uses: actions/checkout@v7
+
+      - name: Checkout ComposeNativeWebview
+        uses: actions/checkout@v7
+        with:
+          repository: ${{ env.COMPOSE_WEBVIEW_REPO }}
+          ref: ${{ env.COMPOSE_WEBVIEW_COMMIT }}
+          path: compose-webview
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Set up Rust
+        # Pinned: Gobley fails to read build-script outputs with the rustc 1.100 target layout.
+        uses: dtolnay/rust-toolchain@1.99.1
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      # compose-webview is a commonMain dependency resolved from mavenLocal (0.1.0-SNAPSHOT).
+      # Only its Android variant is needed here, so skip the Linux desktop native library
+      # (needs WebKitGTK) and the check that the iOS variants (macOS-only builds) are published.
+      - name: Publish compose-webview to mavenLocal
+        working-directory: compose-webview
+        run: |
+          chmod +x gradlew
+          ./gradlew publishToMavenLocal             -x :webview-compose:buildNativeLinux             -x :webview-compose:verifyPublicationCoordinates
+
+      - name: Remove compose-webview checkout
+        run: rm -rf compose-webview
+
+      - name: Configure release signing
+        id: signing
+        env:
+          KEYSTORE: ${{ secrets.KEYSTORE }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEYSTORE_KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
+          KEYSTORE_KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+        run: |
+          STORE="$GITHUB_WORKSPACE/composeApp/upload-keystore.jks"
+          if [ -n "$KEYSTORE" ]; then
+            echo "$KEYSTORE" | base64 --decode > "$STORE"
+          else
+            # Gobley's debug Rust build fails on CI, so always build release. Without secrets,
+            # sign with a throwaway key: the APK installs, but cannot update another run's APK.
+            echo "::warning::No KEYSTORE secret: signing with a throwaway key generated for this run."
+            KEYSTORE_PASSWORD=$(openssl rand -hex 16)
+            KEYSTORE_KEY_PASSWORD=$KEYSTORE_PASSWORD
+            KEYSTORE_KEY_ALIAS=flux
+            keytool -genkeypair -noprompt -keystore "$STORE" -storetype JKS -alias flux \
+              -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Spotube Flux CI" \
+              -storepass "$KEYSTORE_PASSWORD" -keypass "$KEYSTORE_KEY_PASSWORD"
+          fi
+          cat >> composeApp/local.properties <<EOF
+          release.signing.storeFile=$STORE
+          release.signing.storePassword=${KEYSTORE_PASSWORD}
+          release.signing.keyAlias=${KEYSTORE_KEY_ALIAS}
+          release.signing.keyPassword=${KEYSTORE_KEY_PASSWORD}
+          EOF
+
+      - name: Build APK
+        run: |
+          chmod +x gradlew
+          ./gradlew :composeApp:assembleStableRelease --stacktrace
+
+      - name: Collect APK
+        id: apk
+        run: |
+          APK_FILE=$(find composeApp/build/outputs/apk/stable -name "*.apk" -type f | head -1)
+          test -n "$APK_FILE" || { echo "::error::No APK produced"; exit 1; }
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then SUFFIX="${GITHUB_REF_NAME}"; else SUFFIX="$(git rev-parse --short HEAD)"; fi
+          NAME="Spotube-Flux-${SUFFIX}.apk"
+          cp "$APK_FILE" "$NAME"
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          ls -lh "$NAME"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: spotube-flux-apk
+          path: ${{ steps.apk.outputs.name }}
+          retention-days: 14
+
+  release:
+    name: Publish GitHub release
+    needs: build-apk
+    # PRs from this repository publish too (fork PRs get a read-only token, so they don't).
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Download APK
+        uses: actions/download-artifact@v8
+        with:
+          name: spotube-flux-apk
+
+      - name: Tagged release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APK: ${{ needs.build-apk.outputs.apk-name }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "$APK" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" "$APK" \
+              --title "Spotube Flux $GITHUB_REF_NAME" --generate-notes
+          fi
+
+      - name: Rolling pre-release (flux-latest)
+        if: github.ref_type != 'tag'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APK: ${{ needs.build-apk.outputs.apk-name }}
+          # On a PR, GITHUB_SHA is a temporary merge commit: point the release at the branch head.
+          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          SOURCE: ${{ github.head_ref || github.ref_name }}
+        run: |
+          gh release delete flux-latest --cleanup-tag --yes || true
+          gh release create flux-latest "$APK" \
+            --prerelease \
+            --target "$SHA" \
+            --title "Spotube Flux (latest build)" \
+            --notes "Latest Android build of the Flux redesign, from ${SOURCE} at commit ${SHA::7}. Install the APK on your phone (allow installs from unknown sources)."

@@ -169,9 +169,9 @@
     <string name="settings_palette_dialog_description">Wybierz paletę akcentów Millennium i zobacz jej podgląd w jasnym i ciemnym motywie.</string>
     <string name="settings_palette_label">Paleta</string>
     <string name="settings_appearance_subtitle_palette">Paleta i akcent Millennium. Obecnie: %1$s</string>
-    <string name="settings_palette_blue">Niebieska</string>
-    <string name="settings_palette_orange">Pomarańczowa</string>
-    <string name="settings_palette_lime">Limonkowa</string>
+    <string name="settings_palette_blue">Flux</string>
+    <string name="settings_palette_orange">Braise</string>
+    <string name="settings_palette_lime">Prisme</string>
 
     <string name="settings_download_folder_title">Własny folder pobierania</string>
     <string name="settings_download_folder_current">Obecny folder: %1$s</string>

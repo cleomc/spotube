@@ -28,6 +28,11 @@ import org.spotube.spotube.core.ui.component.sharedElementOrNone
 import org.spotube.spotube.core.ui.misc.TextWithShimmer
 import org.spotube.spotube.core.ui.misc.shimmerApply
 import org.spotube.spotube.core.ui.theming.AppTheme
+import org.spotube.spotube.core.ui.theming.FluxPlayPauseIcon
+import org.spotube.spotube.core.ui.theming.fluxHairline
+import org.spotube.spotube.core.ui.theming.fluxPlayingBar
+import org.spotube.spotube.core.ui.theming.fluxPress
+import androidx.compose.ui.graphics.Color
 import org.spotube.spotube.resources.iconsax.Iconsax
 import org.spotube.spotube.resources.iconsax.IconsaxAddSquare
 import org.spotube.spotube.resources.iconsax.IconsaxMusic
@@ -59,7 +64,7 @@ fun PlayableListTile(
     playLoading: Boolean = false,
     addToQueueLoading: Boolean = false,
     imageModel: Any? = imageURL,
-    imageShape: Shape = RoundedCornerShape(6.dp),
+    imageShape: Shape = RoundedCornerShape(10.dp),
     placeholderIcon: ImageVector = Iconsax.IconsaxMusic,
     artwork: (@Composable () -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null,
@@ -67,21 +72,26 @@ fun PlayableListTile(
     compact: Boolean = false
 ) {
     val colors = MillenniumTheme.colors
+    val tileShape = RoundedCornerShape(10.dp)
+    // Flux: a hairline row; the playing one gets a soft wash and an accent tick.
     MillenniumListTile(
-        modifier = modifier,
+        modifier = modifier
+            .fluxPress(0.98f)
+            .fluxPlayingBar(isPlaying)
+            .fluxHairline(),
         onClick = onClick ?: onPlay,
         selected = isPlaying,
-        background = if (isPlaying) null else millenniumPanelBrush(colors),
-        shape = RoundedCornerShape(8.dp),
-        borderColor = if (isBlacklisted) colors.danger.copy(alpha = 0.5f) else if (isPlaying) null else colors.border,
+        background = null,
+        shape = tileShape,
+        borderColor = if (isBlacklisted) colors.danger.copy(alpha = 0.5f) else Color.Transparent,
         titleForeground = if (isBlacklisted) colors.danger else null,
         borderWidth = 1.dp,
         contentPadding = PaddingValues(if (compact) 8.dp else 12.dp),
-        minimumHeight = if (compact) 52.dp else 76.dp,
+        minimumHeight = if (compact) 52.dp else 68.dp,
         leading = {
             MediaArtwork(
                 imageModel, title,
-                Modifier.size(if (compact) 36.dp else 52.dp).sharedElementOrNone(
+                Modifier.size(if (compact) 36.dp else 48.dp).sharedElementOrNone(
                     sharedElementKey,
                     LocalSharedTransitionScope.current,
                     LocalAnimatedVisibilityScope.current
@@ -134,10 +144,11 @@ fun PlayableListTile(
                             modifier = Modifier.size(if (compact) 32.dp else 40.dp),
                             style = MillenniumIconButtonStyle.Primary
                         ) {
-                            MillenniumIcon(
-                                if (isPlaying) Iconsax.IconsaxPause else Iconsax.IconsaxPlay,
-                                stringResource(if (isPlaying) Res.string.player_pause_content_description else Res.string.player_play_content_description),
-                                tint = LocalTextStyle.current.color
+                            FluxPlayPauseIcon(
+                                playing = isPlaying,
+                                contentDescription = stringResource(if (isPlaying) Res.string.player_pause_content_description else Res.string.player_play_content_description),
+                                color = LocalTextStyle.current.color,
+                                modifier = Modifier.size(if (compact) 14.dp else 16.dp)
                             )
                         }
                     }
@@ -152,7 +163,7 @@ internal fun MediaArtwork(
     model: Any?,
     title: String,
     modifier: Modifier,
-    shape: Shape = RoundedCornerShape(6.dp),
+    shape: Shape = RoundedCornerShape(10.dp),
     placeholderIcon: ImageVector = Iconsax.IconsaxMusic,
     artwork: (@Composable () -> Unit)? = null
 ) {
@@ -160,7 +171,7 @@ internal fun MediaArtwork(
         modifier.millenniumSurface(
             background = millenniumBevelBrush(MillenniumTheme.colors),
             shape = shape,
-            borderColor = MillenniumTheme.colors.border,
+            borderColor = MillenniumTheme.colors.text.copy(alpha = 0.14f),
             borderWidth = 1.dp
         ).clip(shape).shimmerApply(),
         contentAlignment = Alignment.Center

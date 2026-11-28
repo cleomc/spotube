@@ -17,6 +17,7 @@
 
 package org.spotube.spotube.modules.settings.sections
 
+import org.spotube.spotube.core.ui.theming.FluxColorSchemes
 import org.spotube.millennium.composables.MillenniumDialogHeader
 import org.spotube.millennium.composables.MillenniumDialogTitle
 import org.spotube.millennium.composables.MillenniumDialogClose
@@ -207,7 +208,7 @@ private fun PaletteSwatch(
     selected: Boolean,
     onClick: () -> Unit) {
     val dark = !isLightAppearance()
-    val scheme = remember(palette, dark) { MillenniumColorSchemes().resolve(palette, dark = dark) }
+    val scheme = remember(palette, dark) { FluxColorSchemes.resolve(palette, dark = dark) }
     Box(
         modifier = Modifier
             .size(40.dp)
@@ -224,7 +225,7 @@ private fun PaletteSwatch(
 @Composable
 private fun PaletteTrailingSwatch(palette: MillenniumPalette) {
     val dark = !isLightAppearance()
-    val scheme = remember(palette, dark) { MillenniumColorSchemes().resolve(palette, dark = dark) }
+    val scheme = remember(palette, dark) { FluxColorSchemes.resolve(palette, dark = dark) }
     Row(
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically) {

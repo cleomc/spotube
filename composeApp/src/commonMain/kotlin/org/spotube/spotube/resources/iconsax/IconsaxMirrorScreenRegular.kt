@@ -1,88 +1,39 @@
+/*
+ * Copyright (C) 2026 Kingkor Roy Tirtho and Spotube Contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// Generated from the Spotube Flux echo icons (geometry from Lucide, ISC licence). Do not edit.
+
 package org.spotube.spotube.resources.iconsax
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.PathData
-import androidx.compose.ui.graphics.vector.group
-import androidx.compose.ui.graphics.vector.path
-import androidx.compose.ui.unit.dp
 
 val Iconsax.IconsaxMirrorScreenRegular: ImageVector
     get() {
-        if (_IconsaxMirrorScreenRegular != null) {
-            return _IconsaxMirrorScreenRegular!!
-        }
-        _IconsaxMirrorScreenRegular = ImageVector.Builder(
+        _IconsaxMirrorScreenRegular?.let { return it }
+        return fluxIcon(
             name = "IconsaxMirrorScreenRegular",
-            defaultWidth = 24.dp,
-            defaultHeight = 24.dp,
-            viewportWidth = 24f,
-            viewportHeight = 24f
-        ).apply {
-            group(
-                clipPathData = PathData {
-                    moveTo(0f, 0f)
-                    horizontalLineToRelative(24f)
-                    verticalLineToRelative(24f)
-                    horizontalLineToRelative(-24f)
-                    close()
-                }
-            ) {
-                path(
-                    stroke = SolidColor(Color.White),
-                    strokeLineWidth = 1.5f,
-                    strokeLineCap = StrokeCap.Round,
-                    strokeLineJoin = StrokeJoin.Round
-                ) {
-                    moveTo(2f, 9f)
-                    verticalLineTo(8f)
-                    curveTo(2f, 5f, 4f, 3f, 7f, 3f)
-                    horizontalLineTo(17f)
-                    curveTo(20f, 3f, 22f, 5f, 22f, 8f)
-                    verticalLineTo(16f)
-                    curveTo(22f, 19f, 20f, 21f, 17f, 21f)
-                    horizontalLineTo(16f)
-                }
-                path(
-                    fillAlpha = 0.4f,
-                    stroke = SolidColor(Color.White),
-                    strokeAlpha = 0.4f,
-                    strokeLineWidth = 1.5f,
-                    strokeLineCap = StrokeCap.Round,
-                    strokeLineJoin = StrokeJoin.Round
-                ) {
-                    moveTo(3.69f, 11.711f)
-                    curveTo(8.31f, 12.301f, 11.7f, 15.701f, 12.3f, 20.321f)
-                }
-                path(
-                    fillAlpha = 0.4f,
-                    stroke = SolidColor(Color.White),
-                    strokeAlpha = 0.4f,
-                    strokeLineWidth = 1.5f,
-                    strokeLineCap = StrokeCap.Round,
-                    strokeLineJoin = StrokeJoin.Round
-                ) {
-                    moveTo(2.62f, 15.07f)
-                    curveTo(6.01f, 15.5f, 8.5f, 18f, 8.94f, 21.39f)
-                }
-                path(
-                    fillAlpha = 0.4f,
-                    stroke = SolidColor(Color.White),
-                    strokeAlpha = 0.4f,
-                    strokeLineWidth = 1.5f,
-                    strokeLineCap = StrokeCap.Round,
-                    strokeLineJoin = StrokeJoin.Round
-                ) {
-                    moveTo(1.98f, 18.859f)
-                    curveTo(3.67f, 19.079f, 4.92f, 20.319f, 5.14f, 22.019f)
-                }
-            }
-        }.build()
-
-        return _IconsaxMirrorScreenRegular!!
+            strokes = listOf(
+                "M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6",
+                "M2 12a9 9 0 0 1 8 8",
+                "M2 16a5 5 0 0 1 4 4",
+                "M2 20L2.01 20",
+            ),
+            fills = emptyList(),
+        ).also { _IconsaxMirrorScreenRegular = it }
     }
 
 @Suppress("ObjectPropertyName")

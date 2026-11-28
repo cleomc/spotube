@@ -169,9 +169,9 @@
     <string name="settings_palette_dialog_description">Виберіть акцентну палітру Millennium і перегляньте її у світлій і темній темах.</string>
     <string name="settings_palette_label">Палітра</string>
     <string name="settings_appearance_subtitle_palette">Палітра Millennium і акцент. Зараз: %1$s</string>
-    <string name="settings_palette_blue">Синя</string>
-    <string name="settings_palette_orange">Помаранчева</string>
-    <string name="settings_palette_lime">Лаймова</string>
+    <string name="settings_palette_blue">Flux</string>
+    <string name="settings_palette_orange">Braise</string>
+    <string name="settings_palette_lime">Prisme</string>
 
     <string name="settings_download_folder_title">Власна папка для завантажень</string>
     <string name="settings_download_folder_current">Поточна папка: %1$s</string>

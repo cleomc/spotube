@@ -18,6 +18,9 @@
 package org.spotube.spotube.modules.home
 
 
+import spotube.composeapp.generated.resources.welcome_app_name
+import org.spotube.spotube.core.ui.theming.FluxWordmark
+import org.spotube.spotube.core.ui.theming.fluxBackground
 import org.spotube.millennium.composables.MillenniumIcon
 import org.spotube.millennium.composables.MillenniumIconButton
 import org.spotube.millennium.composables.MillenniumIconButtonStyle
@@ -95,7 +98,6 @@ import kotlinx.coroutines.flow.map
 import org.jetbrains.compose.resources.Font
 import org.spotube.millennium.adaptive.WindowBreakpoints
 import org.spotube.spotube.resources.iconsax.IconsaxMirrorScreenRegular
-import spotube.composeapp.generated.resources.cookie_regular
 
 @Composable
 fun HomeScreen(viewModel: HomeScreenViewModel) {
@@ -136,21 +138,13 @@ fun HomeScreen(viewModel: HomeScreenViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MillenniumTheme.colors.background)
+            .fluxBackground()
     ) {
         ApplicationMainBar(
             backButton = false,
             title = {
                 if (isSmallScreen) {
-                    Text(
-                        "Spotube",
-                        style = AppTheme.typography.headlineLarge.copy(
-                            fontFamily = FontFamily(
-                                listOf(Font(Res.font.cookie_regular, weight = FontWeight.Normal))
-                            )
-                        ),
-                        color = AppTheme.colors.onSurface
-                    )
+                    FluxWordmark(stringResource(Res.string.welcome_app_name))
                 } else {
                     Text(stringResource(Res.string.home_title_browse))
                 }

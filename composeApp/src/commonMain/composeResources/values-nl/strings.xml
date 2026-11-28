@@ -165,9 +165,9 @@
     <string name="settings_palette_dialog_description">Kies een Millennium-accentpalet en bekijk het in licht en donker.</string>
     <string name="settings_palette_label">Palet</string>
     <string name="settings_appearance_subtitle_palette">Millennium-palet en accent. Huidig: %1$s</string>
-    <string name="settings_palette_blue">Blauw</string>
-    <string name="settings_palette_orange">Oranje</string>
-    <string name="settings_palette_lime">Limoen</string>
+    <string name="settings_palette_blue">Flux</string>
+    <string name="settings_palette_orange">Braise</string>
+    <string name="settings_palette_lime">Prisme</string>
 
     <string name="settings_download_folder_title">Andere downloadmap</string>
     <string name="settings_download_folder_current">Huidige map: %1$s</string>

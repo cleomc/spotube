@@ -1,34 +1,36 @@
+/*
+ * Copyright (C) 2026 Kingkor Roy Tirtho and Spotube Contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// Generated from the Spotube Flux echo icons (geometry from Lucide, ISC licence). Do not edit.
+
 package org.spotube.spotube.resources.iconsax
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.path
-import androidx.compose.ui.unit.dp
 
 val Iconsax.FluentMinus: ImageVector
     get() {
-        if (_FluentMinus != null) {
-            return _FluentMinus!!
-        }
-        _FluentMinus = ImageVector.Builder(
+        _FluentMinus?.let { return it }
+        return fluxIcon(
             name = "FluentMinus",
-            defaultWidth = 24.dp,
-            defaultHeight = 24.dp,
-            viewportWidth = 24f,
-            viewportHeight = 24f
-        ).apply {
-            path(fill = SolidColor(Color(0xFF212121))) {
-                moveTo(3.755f, 12.5f)
-                horizontalLineToRelative(16.492f)
-                arcToRelative(0.75f, 0.75f, 0f, isMoreThanHalf = false, isPositiveArc = false, 0f, -1.5f)
-                horizontalLineTo(3.755f)
-                arcToRelative(0.75f, 0.75f, 0f, isMoreThanHalf = false, isPositiveArc = false, 0f, 1.5f)
-                close()
-            }
-        }.build()
-
-        return _FluentMinus!!
+            strokes = listOf(
+                "M5 12h14",
+            ),
+            fills = emptyList(),
+        ).also { _FluentMinus = it }
     }
 
 @Suppress("ObjectPropertyName")
